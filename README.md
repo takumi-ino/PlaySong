@@ -9,13 +9,16 @@
 現時点で約4カ月(未完)
 2023年8月中旬～現在
 
+
 言語
 
 C++
 
+
 ライブラリ
 
 DxLib
+
 
 一番のアピールポイント
 
@@ -27,7 +30,7 @@ DxLib
 
 ゲームの説明
 
-流れ
+全体
 
 プレイする曲と難易度を選択 ⇒ プレイ開始 ⇒ リザルト 
 
@@ -41,11 +44,35 @@ DxLib
 
 
 使用音源
-サイト名：音楽館
 
-https://ux.getuploader.com/kuran/
+・プレイリスト
 
+サイト名：classix
+
+https://classix.sitefactory.info/mp3classic/beethoven/3804.mp3
+
+サイト名：音楽館 
+
+https://ux.getuploader.com/kuran/download/6
+
+サイト名：ボカロ館
+
+https://ux.getuploader.com/musicworld/download/15
+
+サイト名：nicozon
+
+https://www.nicovideo.jp/watch/sm23727606
+
+
+・ポーズ中BGM
 
 サイト名：東方アレンジ倉庫「ajapaのBGM」
+
 http://ajapabgm.html.xdomain.jp/wav/syoujo.mp3
 
+
+・リザルトBGM
+
+サイト名：音源堂さくら紅葉
+
+https://music.yukizakura.net/free/kanata-s/024.html
