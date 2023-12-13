@@ -54,9 +54,9 @@ int coverAlbum_hdl[PlaySong::COVERALBUM_NUM];
 
 void PlaySong::LoadImages() {
 
-
-	coverAlbum_hdl[0] = LoadGraph("graphics/symphonyNo9.jpg");
 	// ’˜ìŒ ‚ÌŠÖŒWã‰æ‘œ‚Í•\¦‚µ‚È‚¢
+
+	coverAlbum_hdl[0] = LoadGraph("");/*"graphics/symphonyNo9.jpg"*/
 	coverAlbum_hdl[1] = LoadGraph("");//graphics/badApple.jpg
 	coverAlbum_hdl[2] = LoadGraph("");//graphics/two-facedLovers.jpg
 	coverAlbum_hdl[3] = LoadGraph("");//graphics/cruel_angel's _thesis.jpg
