@@ -25,7 +25,7 @@ public:
 	int	poor_count;
 	int	miss_count;
 
-	int comboAnimationFrames;
+	int comboAnimationFrames = 0;
 	int comboAnimationDuration = 1; // アニメーションの持続フレーム数
 
 	const int x1_combo = 590;

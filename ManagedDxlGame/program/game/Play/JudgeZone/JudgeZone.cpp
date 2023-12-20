@@ -300,6 +300,7 @@ void JudgeZone::JudgeNoteHit_ByInputKey(std::vector<NormalNote>& normal_note, co
 			if (Key[KEYS[column]] == true) {
 
 				// ノーマルノーツの当たり判定
+				if(normal_note[row].active)
 				JudgeGrade(normal_note, row, timer, should_input_time);
 
 				// キーを入力したら色が変わる
@@ -327,6 +328,7 @@ void JudgeZone::JudgeNoteHit_ByInputKey(std::vector<LongNote>& long_note, const 
 			if (Key[KEYS[column]] == true) {
 
 				// ロングノーツの当たり判定
+				if (long_note[row].active)
 				JudgeGrade(long_note, row, _timer, should_input_time);
 
 				// キーを入力したら色が変わる

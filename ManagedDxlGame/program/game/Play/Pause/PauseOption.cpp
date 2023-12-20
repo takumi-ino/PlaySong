@@ -197,6 +197,7 @@ void PauseOption::UpdateSelectEffectCursor_ByInput() {
 }
 
 
+
 void PauseOption::ChangeSelectEffectColorAndBrightness(int& eff1_color,int& eff2_color, int& eff3_color) {
 
 
@@ -229,6 +230,7 @@ void PauseOption::RenderAdjustVolumeFunc() {
 	DrawBox(LEFTSIDE, UPSIDE + 60, LEFTSIDE + 350, UPSIDE + 70, -1, true);
 	DrawCircle(LEFTSIDE + volumeIndex, UPSIDE + 65, 10, -1, true);
 }
+
 
 
 void PauseOption::RenderLowMediumHighWord(int& eff1_color,int& eff2_color,int& eff3_color) {

@@ -21,16 +21,9 @@ void Title::Update(float deltaTime) {
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 
-	if (_alpha < 360.f) {
 
-		_alpha += 0.1f;
+	_alpha = (_alpha < 360.0f) ? _alpha += 0.1f : _alpha = 0.0f;
 
-
-	}
-	if (_alpha >= 360.f) {
-
-		_alpha = 0.f;
-	}
 
 	float flash = sin(_alpha) * 120.f;
 

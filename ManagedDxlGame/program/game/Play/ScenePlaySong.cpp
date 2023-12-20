@@ -141,13 +141,10 @@ void PlaySong::FadeScreenByAlpha() {
 		elapsed = 0.f;
 		progress_ratio = 0.f;
 	}
-	if (isFadeIn) {
 
-		alpha = 255 * (1 * progress_ratio);
-	}
-	else {
-		alpha = 255 * (1 - progress_ratio);
-	}
+
+	alpha = isFadeIn ? (alpha = 255 * (1 * progress_ratio)) : (alpha = 255 * (1 - progress_ratio));
+
 }
 
 
@@ -157,6 +154,8 @@ void PlaySong::CheckIfSongEndByTimer() {
 	_timer->currentTime = _timer->Elapsed();  // タイマー
 
 	if (_timer->currentTime > (songDuration / 1000.0)) {  // 曲が終わったら
+
+		StopSoundMem(songList[songIndex]);
 
 		moveToResult = true;  // リザルトへ
 	}
@@ -221,9 +220,9 @@ void PlaySong::Render() {
 
 			if (!moveToResult) Audio_MP3();  // 音源
 
-			SetFontSize(35); // タイマー表示
-			std::string time = std::to_string(_timer->currentTime);
-			DrawString(50, 50, time.c_str(), -1);
+			//SetFontSize(35); // タイマー表示(左上)
+			//std::string time = std::to_string(_timer->currentTime);
+			//DrawString(50, 50, time.c_str(), -1);
 
 			StopSoundMem(pause_BGM_hdl);  // ポーズ画面BGM停止
 			SetCurrentPositionSoundMem(0, pause_BGM_hdl);
@@ -311,8 +310,8 @@ void PlaySong::Update(float delta_time) {
 
 	raw_deltaTime_value = &delta_time;
 
-	SetFontSize(30);
-	DrawStringEx(10, 690, -1, "%f.2", GetFPS());
+	//SetFontSize(30);
+	//DrawStringEx(10, 690, -1, "%f.2", GetFPS());
 
 	sequence.update(delta_time);
 }
@@ -370,6 +369,7 @@ bool PlaySong::SeqIdle(float delta_time) {
 
 		if (isPaused)	isPaused = false;
 
+		moveToResult = false;
 
 		auto mgr = SceneManager::GetInstance();
 		mgr->SceneChange(new Result(
@@ -383,7 +383,6 @@ bool PlaySong::SeqIdle(float delta_time) {
 			songName,
 			songLevel)); // 選んだ曲の番号 を PlaySongシーンに渡す
 
-		moveToResult = false;
 	}
 
 	return true;

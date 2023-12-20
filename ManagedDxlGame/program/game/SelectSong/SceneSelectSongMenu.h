@@ -23,18 +23,6 @@ public:
 
 	void SongGenreTotalCount();
 
-	//// 曲のタイトル
-	static const char* _songTitle[PLAYLIST_NUM];
-
-	//// 各曲対応のジャンル
-	static const char* _songGenre[PLAYLIST_NUM];
-
-	//// 本作品で取り扱いたい曲のジャンル一覧
-	static const char* _songGenreRefAll[GENRE_NUM];
-
-	//// 難易度項目（リテラル）、EasyからAbyssまで
-	static const char* _songLevels[4];
-
 private:
 
 
@@ -48,7 +36,6 @@ private:
 	void BackToPreviousByInput();
 
 	void SelectingLevelByInput();
-
 
 	// ゲーム開始
 	void StartPlaySongByInput();
@@ -66,6 +53,24 @@ private:
 
 	tnl::Sequence<SelectSongMenu> sequence = tnl::Sequence<SelectSongMenu>(this, &SelectSongMenu::SeqIdle);
 	
+
+public:
+
+	//// 曲のタイトル
+	static const char* _songTitle[PLAYLIST_NUM];
+
+	//// 各曲対応のジャンル
+	static const char* _songGenre[PLAYLIST_NUM];
+
+	//// 本作品で取り扱いたい曲のジャンル一覧
+	static const char* _songGenreRefAll[GENRE_NUM];
+
+	//// 難易度項目（リテラル）、EasyからAbyssまで
+	static const char* _songLevels[4];
+
+
+private:
+
 	// 左側に選択中の曲名を大きく表示
 	int songTitleXPos_leftSide = 360;
 	int	songTitleYPos_leftSide = 280;
@@ -77,8 +82,6 @@ private:
 	int dimScreen_alphaSize = 50;
 	int notesAllNum;
 	bool backToTitle = false;
-
-
 
 
 	const int _LEVEL_NUM = 4; // 難易度の数
