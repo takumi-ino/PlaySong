@@ -31,7 +31,6 @@ Result::Result(int score, int maxCombo, int Perfect, int Great, int Good,
 }
 
 
-
 const char* Result::GetRank(int resultScore) {
 
 	// 文字列の連結は両方のオペランドが std::string型である必要がある
@@ -54,9 +53,7 @@ const char* Result::GetRank(int resultScore) {
 }
 
 
-
 void Result::LoadMyPastHighScore()  {
-
 
 	FILE* fp = nullptr;
 	errno_t error = fopen_s(&fp, "scoreData/scoreData.bin.", "wb");
@@ -75,16 +72,13 @@ void Result::LoadMyPastHighScore()  {
 }
 
 
-
 void Result::CheckIfNeed_OverwriteHighScore() {
-
 
 	// 新しいスコアと古いスコアを比較、高い方のみ更新
 	if (_scoreInt > _highScoreInt) {
 
 		_highScoreInt = _scoreInt;
 		_highScore = std::to_string(_highScoreInt);
-
 
 		FILE* fp = nullptr;
 		errno_t error = fopen_s(&fp, "scoreData/scoreData.bin.", "wb");
@@ -111,47 +105,41 @@ void Result::CheckIfNeed_OverwriteHighScore() {
 }
 
 
+void Result::DrawResult(const float x, const float y, const int fontSize, const std::string& text, const std::string& value) {
+
+	SetFontSize(fontSize);
+	DrawStringEx(x, y, -1, text.c_str());
+
+	if (!value.empty()) {
+
+		DrawStringEx(x, y + fontSize * 0.5, -1, value.c_str());
+	}
+}
+
+
 void Result::Render() {
 
-	// ノーツ判定のグレード
-	SetFontSize(22);
-	// Perfect
-	DrawStringEx(DXE_WINDOW_WIDTH / 5.2f, DXE_WINDOW_HEIGHT / 2.8f, -1, "PERFECT");
-	// Great
-	DrawStringEx(DXE_WINDOW_WIDTH / 3.1f, DXE_WINDOW_HEIGHT / 3.3f, -1, "GREAT");
-	// Good
-	DrawStringEx(DXE_WINDOW_WIDTH / 2.15f, DXE_WINDOW_HEIGHT / 4.0f, -1, "GOOD");
-	// Poor
-	DrawStringEx(DXE_WINDOW_WIDTH / 1.55f, DXE_WINDOW_HEIGHT / 3.3f, -1, "POOR");
-	// Miss
-	DrawStringEx(DXE_WINDOW_WIDTH / 1.3f, DXE_WINDOW_HEIGHT / 2.8f, -1, "MISS");
-	// コンボ
-	DrawStringEx(DXE_WINDOW_WIDTH / 1.2f, DXE_WINDOW_HEIGHT / 1.7f, -1, "MAX COMBO");
+	DrawResult(DXE_WINDOW_WIDTH / 5.2f, DXE_WINDOW_HEIGHT / 2.8f, 22, "PERFECT");
+	DrawResult(DXE_WINDOW_WIDTH / 3.1f, DXE_WINDOW_HEIGHT / 3.3f, 22, "GREAT");
+	DrawResult(DXE_WINDOW_WIDTH / 2.15f, DXE_WINDOW_HEIGHT / 4.0f, 22, "GOOD");
+	DrawResult(DXE_WINDOW_WIDTH / 1.55f, DXE_WINDOW_HEIGHT / 3.3f, 22, "POOR");
+	DrawResult(DXE_WINDOW_WIDTH / 1.3f, DXE_WINDOW_HEIGHT / 2.8f, 22, "MISS");
+	DrawResult(DXE_WINDOW_WIDTH / 1.2f, DXE_WINDOW_HEIGHT / 1.7f, 22, "MAX COMBO");
 
-	SetFontSize(66);
-	DrawStringEx(DXE_WINDOW_WIDTH / 5.2f, DXE_WINDOW_HEIGHT / 2.5f, -1, (_Perfect).c_str());
-	DrawStringEx(DXE_WINDOW_WIDTH / 3.1f, DXE_WINDOW_HEIGHT / 3.0f, -1, (_Great).c_str());
-	DrawStringEx(DXE_WINDOW_WIDTH / 2.15f, DXE_WINDOW_HEIGHT / 3.5f, -1, (_Good).c_str());
-	DrawStringEx(DXE_WINDOW_WIDTH / 1.55f, DXE_WINDOW_HEIGHT / 3.0f, -1, (_Poor).c_str());
-	DrawStringEx(DXE_WINDOW_WIDTH / 1.3f, DXE_WINDOW_HEIGHT / 2.5f, -1, (_Miss).c_str());
-	DrawStringEx(DXE_WINDOW_WIDTH / 1.2f, DXE_WINDOW_HEIGHT / 1.55f, -1, (_maxCombo).c_str());
+	DrawResult(DXE_WINDOW_WIDTH / 5.2f, DXE_WINDOW_HEIGHT / 2.5f, 66, (_Perfect).c_str());
+	DrawResult(DXE_WINDOW_WIDTH / 3.1f, DXE_WINDOW_HEIGHT / 3.0f, 66, (_Great).c_str());
+	DrawResult(DXE_WINDOW_WIDTH / 2.15f, DXE_WINDOW_HEIGHT / 3.5f, 66, (_Good).c_str());
+	DrawResult(DXE_WINDOW_WIDTH / 1.55f, DXE_WINDOW_HEIGHT / 3.0f, 66, (_Poor).c_str());
+	DrawResult(DXE_WINDOW_WIDTH / 1.3f, DXE_WINDOW_HEIGHT / 2.5f, 66, (_Miss).c_str());
+	DrawResult(DXE_WINDOW_WIDTH / 1.2f, DXE_WINDOW_HEIGHT / 1.55f, 66, (_maxCombo).c_str());
 
-	SetFontSize(35);
-	// スコア
-	DrawStringEx(DXE_WINDOW_WIDTH / 2.35f, DXE_WINDOW_HEIGHT / 2.2f, -1, "S C O R E");
-	SetFontSize(99);
-	DrawStringEx(DXE_WINDOW_WIDTH / 2.35f, DXE_WINDOW_HEIGHT / 1.9f, -1, _score.c_str());
+	DrawResult(DXE_WINDOW_WIDTH / 2.35f, DXE_WINDOW_HEIGHT / 2.2f, 35, "S C O R E");
+	DrawResult(DXE_WINDOW_WIDTH / 2.35f, DXE_WINDOW_HEIGHT / 1.9f, 99, _score);
 
-	// ランク
-	SetFontSize(150);
-	DrawStringEx(DXE_WINDOW_WIDTH / 2.2f, DXE_WINDOW_HEIGHT / 1.4f, -1, _rank);
+	DrawResult(DXE_WINDOW_WIDTH / 2.2f, DXE_WINDOW_HEIGHT / 1.4f, 150, _rank);
 
-
-	SetFontSize(40);
-	// 曲名
-	DrawStringEx(50, DXE_WINDOW_HEIGHT / 1.3f, -1, _songName);
-	// 難易度
-	DrawStringEx(50, DXE_WINDOW_HEIGHT / 1.2f, -1, _songLevel);
+	DrawResult(50, DXE_WINDOW_HEIGHT / 1.3f, 40, _songName);
+	DrawResult(50, DXE_WINDOW_HEIGHT / 1.2f, 40, _songLevel);
 }
 
 

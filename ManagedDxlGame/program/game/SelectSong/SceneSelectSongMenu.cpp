@@ -7,8 +7,46 @@
 #include "../Play/ScenePlaySong.h"
 
 
-int genreCount[GENRE_NUM];
+namespace {
 
+	const int _LEVEL_NUM = 4; // 難易度の数
+	const int _PLAYLIST_X_POS = 895;
+	const int _PLAYLIST_Y_POS = 70;
+	const int _LEVELLIST_X_POS = 310;
+	const int _LEVELLIST_Y_POS = 580;
+
+	const int _LEVELSHAPES_X_POS = 335;  // 難易度文字列を囲う図形
+
+
+	// プレイシーンに飛ぶ前に表示する、選択した曲名の X軸
+	const int _SELECTED_SONG_TEXT_POS_X = 355;
+	const int _SELECTED_SONG_TEXT_POS_Y = 120;
+
+	const int _SELECTED_LEVEL_TEXT_POS_X = 580;
+	const int _SELECTED_LEVEL_TEXT_POS_Y = 250;
+
+	const int _START_TEXT_POS_X = 445;
+	const int _BACK_TEXT_POS_X = 785;
+	const int _STARTBACK_TEXT_POS_Y = 450;
+
+	const int _BIGSIZE_TITLE_POS_X = 330;
+	const int _BIGSIZE_TITLE_POS_Y = 380;
+
+	// 曲タイトル初期位置オフセット
+	const int _defaultSongXPos = 1050;
+
+	// 選択中文字列座標移動
+	const int nowSelectedSong_offsetX = _defaultSongXPos - 15;
+
+	// 難易度未選択状態の色
+	const int defaultSong_color = GetColor(255, 255, 255);
+
+	// 選択中難易度の枠の色
+	const int nowSelectedSong_color = GetColor(255, 0, 0);
+}
+
+
+int genreCount[GENRE_NUM];
 
 const char* SelectSongMenu::_songTitle[PLAYLIST_NUM] =
 {
@@ -149,11 +187,13 @@ void SelectSongMenu::PickOneSongByInput() {
 				PlaySoundMem(titleToSelectMenu_hdl, DX_PLAYTYPE_BACK, TRUE);
 				soundPlayed = true;
 			}
+
 			moveToPlayScene = true;
 
 
 			auto mgr = SceneManager::GetInstance();
-			mgr->SceneChange(new PlaySong(_songTitle[songIndex],  //選択曲
+			mgr->SceneChange(new PlaySong(
+				_songTitle[songIndex],     //選択曲
 				_songLevels[levelIndex],  //選択難易度、
 				songIndex, levelIndex)); // 選んだ曲の番号 を PlaySongシーンに渡す
 		}
@@ -213,7 +253,6 @@ void SelectSongMenu::SelectingLevelByInput() {
 
 void SelectSongMenu::StartPlaySongByInput() {
 
-
 	if (show_finalCheck_before_startPlaySong) {
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, dimScreen_alphaSize);
@@ -242,7 +281,6 @@ void SelectSongMenu::StartPlaySongByInput() {
 
 void SelectSongMenu::RenderAndChangeColor_SongTitle() {
 
-
 	for (int i = 0; i < PLAYLIST_NUM; i++)
 	{
 		// 選択中の曲なら色を変える
@@ -254,8 +292,9 @@ void SelectSongMenu::RenderAndChangeColor_SongTitle() {
 		else {
 			SetDrawBright(255, 255, 255); // 色を白に戻す
 		}
+
 		// 曲名を表示する
-		DrawStringEx(_PLAYLIST_X_POS, _PLAYLIST_Y_POS * (i + 1), -1, _songTitle[i]);
+		DrawString(_PLAYLIST_X_POS, _PLAYLIST_Y_POS * (i + 1), _songTitle[i], -1);
 	}
 }
 
@@ -267,22 +306,34 @@ void SelectSongMenu::RenderAndChangeColor_SongLevel() {
 		// 選択中の難易度なら色を変える				
 		if (levelSelect && i == levelIndex)
 		{
-			SetDrawBright(255, 255, 0); // 色を黄色にする
+			SetDrawBright(255, 255, 0);   // 色を黄色にする
 		}
 		else {
 			SetDrawBright(255, 255, 255); // 色を白に戻す
 		}
 
 		// 難易度を表示する
-		DrawOvalAA(335 + ((i + 1) * 100), _LEVELLIST_Y_POS, 50, 50, 8, -1, false, 1);
+		DrawOvalAA(
+			static_cast<float>(_LEVELSHAPES_X_POS + ((i + 1) * 100)), 
+			_LEVELLIST_Y_POS,
+			50, 50, 8, -1,
+			false, 
+			1
+		);
+
 		SetFontSize(15);
-		DrawStringEx(_LEVELLIST_X_POS + ((i + 1) * 100), _LEVELLIST_Y_POS, -1, _songLevels[i]);
+
+		DrawString(
+			_LEVELLIST_X_POS + ((i + 1) * 100),
+			_LEVELLIST_Y_POS,
+			 _songLevels[i],
+			-1
+		);
 	}
 }
 
 
 void SelectSongMenu::RenderBigSizeTitle_AtCenter() {
-
 
 	SetDrawBright(255, 255, 255);
 	//難易度上に選択中の曲のタイトル（大）
@@ -326,22 +377,14 @@ void SelectSongMenu::Update(float deltaTime) {
 
 	if (moveToPlayScene) {
 
-		sequence.update(deltaTime);
-
 		StopSoundMem(songList[songIndex]);
 		SetCurrentPositionSoundMem(0, songList[songIndex]);
 		songSelect = true;
 	}
 }
 
-// プレイシーン遷移関数
+
 bool SelectSongMenu::SeqIdle(float deltaTime) {
-
-	if (moveToPlayScene) {
-
-	}
-
-	// タイトルシーンへ戻る処理もあとで追加
 
 	return true;
 }

@@ -7,19 +7,9 @@
 class Scenes;
 
 class SceneManager {
-public:
-
-	static SceneManager* GetInstance(Scenes* scene = nullptr);
-	static void Destroy();
-
-	// タイトル画面、曲選択画面、プレイ画面、リザルト画面
-	void SceneChange(Scenes* next, float time = 0.5f);
-	void Update(float deltaTime);
-
 private:
 
-	SceneManager(Scenes* scene);
-	~SceneManager();
+	explicit SceneManager(Scenes* start_scene);
 
 	tnl::Sequence<SceneManager> sequence_ = tnl::Sequence<SceneManager>(this, &SceneManager::SeqFadeIn);
 
@@ -27,10 +17,24 @@ private:
 	bool SeqFadeIn(const float deltaTime);
 	bool SeqRun(const float deltaTime);
 
+public:
+
+	static SceneManager* GetInstance(Scenes* scene = nullptr);
+
+	void Destroy();
+
+	// タイトル画面、曲選択画面、プレイ画面、リザルト画面
+	void SceneChange(Scenes* next, float time = 0.5f);
+
+	void Update(float deltaTime);
+
 private:
 
 	Scenes* _nowScene = nullptr;
 	Scenes* _nextScene = nullptr;
-	float _transitionTime = 0.5f;   // 遷移に掛かる時間
-	int _BG_gfx = 0;
+
+private:
+
+	float _transTime = 0.5f;
+	int   _transGraph_hdl = 0;
 };

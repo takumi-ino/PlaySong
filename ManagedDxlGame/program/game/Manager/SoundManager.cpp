@@ -41,5 +41,8 @@ void SoundManager::LoadBGM() {
 
 void SoundManager::Destroy() {
 
-
+	DeleteSoundMem(songList[0]);
+	DeleteSoundMem(songList[1]);
+	DeleteSoundMem(songList[2]);
+	DeleteSoundMem(songList[3]);
 }

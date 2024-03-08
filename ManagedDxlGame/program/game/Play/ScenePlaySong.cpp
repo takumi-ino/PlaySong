@@ -1,51 +1,62 @@
 #include "../Main.h"
-#include "ScenePlaySong.h"
 #include "../Result/SceneResult.h"
 #include "../SelectSong/SceneSelectSongMenu.h"
 #include "../dxlib_ext/dxlib_ext.h"
 #include "JudgeZone/JudgeZone.h"
 #include "Score_Combo/ScoreCombo.h"
 #include "Pause/PauseOption.h"
+#include "Timer/Timer.h"
 #include "Note/Notes.h"
-#include "Note/LoadCSV/NoteDataCsv.h"
 #include "Note/Normal/NormalNote.h"
 #include "Note/Long/LongNote.h"
+#include "Note/LoadCSV/NoteDataCsv.h"
+#include "ScenePlaySong.h"
 
 
 JudgeZone judgeZone[4];
 Timer* PlaySong::_timer;
 
 
-PlaySong::PlaySong(const char* title, const char* level, int index, int levelIdx) {
+namespace {
+
+	const int _COVERALBUM_POS_X1 = 320;
+	const int _COVERALBUM_POS_X2 = 960;
+
+	const char* songName;     // 曲名
+	const char* songLevel;    // 難易度
+}
+
+
+
+PlaySong::PlaySong(const char* title, const char* level, const int index, const int levelIdx) {
 
 	songName = title;
 	songLevel = level;
-	songIndex = index;	// 選択曲タイトルとカバーアルバムで共有
+	songIndex = index;	   // 選択曲タイトルとカバーアルバムで共有
 	levelIndex = levelIdx;
 
-	songDuration = GetSoundTotalTime(songList[songIndex]);  // 曲の長さ取得
-
-	// デルタタイム。各クラスで共有
-	raw_deltaTime_value = new float();
-
-	NoteDataCsv::GetInstance().SetNoteKeyValue();
-
-	LoadSelectedSongNotes();
-
-	judgeZone->InitJudgeZone();
-	_scoreCombo = new ScoreCombo();
-
-	_scoreCombo->SetScoreComboRef(_scoreCombo);
-	judgeZone->SetScoreComboRef(_scoreCombo);
-
-	_normal_noteRef = dynamic_cast<NormalNote*>(_normal_downcastRef);
-	_long_noteRef = dynamic_cast<LongNote*>(_long_downcastRef);
-
-	_timer = new Timer();
-	_pauseOption = new PauseOption();
+	songDuration = static_cast<float>(GetSoundTotalTime(songList[songIndex]));  // 曲の長さ取得
 
 	LoadImages();
 	SetSongBPM();
+
+	// スコア・コンボオブジェクト生成-------------------------------------------------------
+	_scoreCombo = new ScoreCombo();
+	_scoreCombo->SetScoreComboRef(_scoreCombo);
+
+	// 判定エリアオブジェクト生成-----------------------------------------------------------
+	judgeZone->InitJudgeZone();
+	judgeZone->SetScoreComboRef(_scoreCombo);
+
+	// ノーツ系各種初期化----------------------------------------------------------------
+	NoteDataCsv::GetInstance().SetNoteKeyValue();
+	LoadSelectedSongNotes();
+	_normal_noteRef = dynamic_cast<NormalNote*>(_normal_downcastRef);
+	_long_noteRef = dynamic_cast<LongNote*>(_long_downcastRef);
+
+	// タイマー、ポーズオプションオブジェクト生成-------------------------------------------
+	_timer = new Timer();
+	_pauseOption = new PauseOption();
 }
 
 
@@ -69,47 +80,50 @@ void PlaySong::SetSongBPM() {
 	else if (songIndex == 1)  songBpm = 130;
 	else if (songIndex == 2)  songBpm = 140;
 	else if (songIndex == 2)  songBpm = 110;
+
+	spawnNotesDuration = 60.0 / songBpm;
 }
 
 
 void PlaySong::LoadSelectedSongNotes() {
 
-	// 選択した曲のノーツをロード
-
-	if (songIndex == 0) {
-
+	switch (songIndex)
+	{
+	case 0:
+	{
 		_normal_downcastRef = new NormalNote("交響曲第9番");
 		_long_downcastRef = new LongNote("交響曲第9番");
+		break;
 	}
-
-	else if (songIndex == 1) {
-
+	case 1:
+	{
 		_normal_downcastRef = new NormalNote("BadApple!!");
 		_long_downcastRef = new LongNote("BadApple!!");
+		break;
 	}
-
-
-	else if (songIndex == 2) {
-
+	case 2:
+	{
 		_normal_downcastRef = new NormalNote("裏表ラバーズ");
 		_long_downcastRef = new LongNote("裏表ラバーズ");
+		break;
 	}
-
-	else if (songIndex == 3) {
-
+	case 3:
+	{
 		_normal_downcastRef = new NormalNote("残酷な天使のテーゼ");
 		_long_downcastRef = new LongNote("残酷な天使のテーゼ");
+		break;
+	}
 	}
 }
 
 
+void PlaySong::PlaySongUntilSongEnd() {
 
-void PlaySong::Audio_MP3() {
-
-	if (!moveToResult)  PlaySoundMem(songList[songIndex], DX_PLAYTYPE_BACK, FALSE);
-	else DeleteSoundMem(songList[songIndex]);
+	if (!moveToResult)
+		PlaySoundMem(songList[songIndex], DX_PLAYTYPE_BACK, FALSE);
+	else
+		DeleteSoundMem(songList[songIndex]);
 }
-
 
 
 void PlaySong::RenderMetaData() {
@@ -120,14 +134,13 @@ void PlaySong::RenderMetaData() {
 }
 
 
-
 void PlaySong::FadeScreenByAlpha() {
 
 	// シーン遷移後、カバーアルバムと曲タイトルがフェードイン
 
 	elapsed = sequence.getProgressTime();
 	progress_ratio = elapsed / duration;
-	alpha = 0;
+	brightnessAlpha = 0;
 
 	if (elapsed >= duration) {  // フェードイン
 
@@ -142,11 +155,8 @@ void PlaySong::FadeScreenByAlpha() {
 		progress_ratio = 0.f;
 	}
 
-
-	alpha = isFadeIn ? (alpha = 255 * (1 * progress_ratio)) : (alpha = 255 * (1 - progress_ratio));
-
+	brightnessAlpha = isFadeIn ? (brightnessAlpha = 255 * (1 * progress_ratio)) : (brightnessAlpha = 255 * (1 - progress_ratio));
 }
-
 
 
 void PlaySong::CheckIfSongEndByTimer() {
@@ -155,30 +165,30 @@ void PlaySong::CheckIfSongEndByTimer() {
 
 	if (_timer->currentTime > (songDuration / 1000.0)) {  // 曲が終わったら
 
-		StopSoundMem(songList[songIndex]);
-
 		moveToResult = true;  // リザルトへ
 	}
 }
 
 
-
 void PlaySong::ShowSongInfo_BeforeStart() {
 
-	if (moveToResult) moveToResult = false;
+	if (moveToResult)
+		moveToResult = false;
 
 	FadeScreenByAlpha();
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(brightnessAlpha));
 
-	if (alpha <= 0)	alpha = 0;
+	if (brightnessAlpha <= 0)
+		brightnessAlpha = 0.f;
+
 	// カバーアルバム
 	DrawExtendGraph(_COVERALBUM_POS_X1, 70, _COVERALBUM_POS_X2, 620, coverAlbum_hdl[songIndex], false);
 	SetFontSize(75);
 	DrawStringEx(DXE_WINDOW_WIDTH / 3, 625, -1, songName); // 曲名
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, alpha);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, static_cast<int>(brightnessAlpha));
 
-	if (alpha == 0) {
+	if (brightnessAlpha == 0) {
 
 		showInfo_beforeStart_playSong = false;
 		elapsed = 0.f;
@@ -204,12 +214,14 @@ void PlaySong::Render() {
 	switch (currentState)
 	{
 	case 0:
+
 		if (showInfo_beforeStart_playSong) {
 
 			ShowSongInfo_BeforeStart();
 		}
 		break;
 	case 1:
+
 		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_P) ||
 			tnl::Input::IsPadDownTrigger(ePad::KEY_4)) {
 
@@ -218,7 +230,8 @@ void PlaySong::Render() {
 
 		if (!isPaused) {
 
-			if (!moveToResult) Audio_MP3();  // 音源
+			if (!moveToResult)
+				PlaySongUntilSongEnd();  // 音源
 
 			//SetFontSize(35); // タイマー表示(左上)
 			//std::string time = std::to_string(_timer->currentTime);
@@ -231,7 +244,6 @@ void PlaySong::Render() {
 			RenderMetaData(); // 曲情報描画
 
 			_scoreCombo->RenderCombo(); // コンボ描画
-
 			_scoreCombo->RenderScore(); // スコア描画
 
 			// 曲が終わったら問答無用でリザルトへ
@@ -241,8 +253,8 @@ void PlaySong::Render() {
 			judgeZone->RenderJudgeZones();
 
 			//　ノーツ及び当たり判定エリア処理。この関数内で全て行っている。
-			_normal_noteRef->UpdateNotes(_timer->currentTime, *(raw_deltaTime_value));
-			_long_noteRef->UpdateNotes(_timer->currentTime, *(raw_deltaTime_value));
+			_normal_noteRef->UpdateNotes(_timer->currentTime, GetDeltaTime());
+			_long_noteRef->UpdateNotes(_timer->currentTime, GetDeltaTime());
 
 			DrawStringEx(5, 5, -1, "PAUSE：P");
 			break;
@@ -282,7 +294,7 @@ void PlaySong::Render() {
 				int eff1_color = -1, eff2_color = -1, eff3_color = -1;
 
 
-				if (_pauseOption->selectEffColor) { // low, medium, highの文字列の色の変更
+				if (_pauseOption->selectEffectColor) { // low, medium, highの文字列の色の変更
 
 					_pauseOption->UpdateSelectEffectCursor_ByInput();
 					_pauseOption->ChangeSelectEffectColorAndBrightness(eff1_color, eff2_color, eff3_color);
@@ -305,95 +317,83 @@ void PlaySong::Render() {
 
 void PlaySong::Update(float delta_time) {
 
+	sequence.update(delta_time);
+
 	_timer->UpdateDeltaTime();
 	_timer->GetDeltaTime();
 
-	raw_deltaTime_value = &delta_time;
-
-	//SetFontSize(30);
-	//DrawStringEx(10, 690, -1, "%f.2", GetFPS());
-
-	sequence.update(delta_time);
-}
-
-
-
-bool PlaySong::SeqIdle(float delta_time) {
-
+	deltaTime_ref = delta_time;
 
 	if (moveToSongSelect) {
 
-		StopSoundMem(songList[songIndex]);
-		SetCurrentPositionSoundMem(0, songList[songIndex]);
-		ClearDrawScreen();
-
-		if (isPaused)	isPaused = false;
-		_scoreCombo->myScore = 0;
-
-
-		if (moveToResult) moveToResult = false;
+		ResetGame();
 
 		// 選曲シーンへ
 		auto mgr = SceneManager::GetInstance();
 		mgr->SceneChange(new SelectSongMenu());
 	}
 
-	if (_pauseOption->isRetryGame) {
+	if (PauseOption::isRetryGame) {
 
-		StopSoundMem(songList[songIndex]);
-		SetCurrentPositionSoundMem(0, songList[songIndex]);
-		ClearDrawScreen();
+		ResetGame();
 
-
-		_scoreCombo->myScore = 0;
-		if (isPaused)	isPaused = false;
-
-		_pauseOption->isRetryGame = false;
-
-		if (moveToResult) moveToResult = false;
+		PauseOption::isRetryGame = false;
 
 		auto mgr = SceneManager::GetInstance();
 		mgr->SceneChange(new PlaySong(
-			SelectSongMenu::_songTitle[songIndex],  //選択曲
-			SelectSongMenu::_songLevels[levelIndex],  //選択難易度、
+			SelectSongMenu::_songTitle[songIndex],   //選択曲
+			SelectSongMenu::_songLevels[levelIndex], //選択難易度、
 			songIndex,
-			levelIndex)); // 選んだ曲の番号 を PlaySongシーンに渡す
+			levelIndex)
+		); // 選んだ曲の番号 を PlaySongシーンに渡す
 	}
 
 	if (moveToResult) {
 
-		StopSoundMem(songList[songIndex]);
-		SetCurrentPositionSoundMem(0, songList[songIndex]);
-		ClearDrawScreen();
+		SetFontSize(50);
+		DrawString(400, 360, "Move to Result", -1);
 
+		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN)) {
 
-		if (isPaused)	isPaused = false;
+			ResetGame();
 
-		moveToResult = false;
-
-		auto mgr = SceneManager::GetInstance();
-		mgr->SceneChange(new Result(
-			_scoreCombo->myScore,
-			_scoreCombo->myCombo,
-			_scoreCombo->perfect_count,
-			_scoreCombo->great_count,
-			_scoreCombo->good_count,
-			_scoreCombo->poor_count,
-			_scoreCombo->miss_count,
-			songName,
-			songLevel)); // 選んだ曲の番号 を PlaySongシーンに渡す
-
+			auto mgr = SceneManager::GetInstance();
+			mgr->SceneChange(new Result(
+				_scoreCombo->myScore,
+				_scoreCombo->myCombo,
+				_scoreCombo->perfect_count,
+				_scoreCombo->great_count,
+				_scoreCombo->good_count,
+				_scoreCombo->poor_count,
+				_scoreCombo->miss_count,
+				songName,
+				songLevel)
+			); // 選んだ曲の番号 を PlaySongシーンに渡す
+		}
 	}
+}
 
+
+bool PlaySong::SeqIdle(float delta_time) {
 	return true;
 }
 
 
+void PlaySong::ResetGame()
+{
+	StopSoundMem(songList[songIndex]);
+	SetCurrentPositionSoundMem(0, songList[songIndex]);
+	ClearDrawScreen();
+
+	isPaused = false;
+	moveToResult = false;
+	moveToSongSelect = false;
+
+	Destroy();
+}
+
 
 void PlaySong::Destroy() {
-
-	//delete raw_deltaTime_value;
-	//raw_deltaTime_value = nullptr;
 
 	delete _scoreCombo;
 	_scoreCombo = nullptr;
@@ -406,10 +406,4 @@ void PlaySong::Destroy() {
 
 	_long_downcastRef = nullptr;
 	delete _long_downcastRef;
-
-	//delete _normal_noteRef;
-	//_normal_noteRef = nullptr;
-
-	//delete _long_noteRef;
-	//_long_noteRef = nullptr;
 }

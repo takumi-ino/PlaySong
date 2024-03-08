@@ -1,12 +1,10 @@
-#include "Notes.h"
 #include "../Timer/Timer.h"
 #include "LoadCSV/NoteDataCsv.h"
-
+#include "Notes.h"
 
 
 Notes::Notes(const std::string& csv_key) {
-
-	
+		
 	decltype(auto) csv = NoteDataCsv::GetInstance().LoadNoteCsv(csv_key);
 
 	for (int i = 0; i < csv.size(); ++i) {                   // CSV縦列
@@ -16,7 +14,7 @@ Notes::Notes(const std::string& csv_key) {
 		NoteType.emplace_back(csv[i][2].getString());        // std::stringに変換
 
 		// 生成位置から判定エリアまでの移動時間差分を差し引く
-		justSpawnTime_ms[i] -= (moveToJudgeZoneSecond );
+		justSpawnTime_ms[i] -= static_cast<float>(moveToJudgeZoneSecond);
 
 		switch (lane[i]) // レーンが一致する各配列に末尾から要素を追加
 		{
@@ -28,15 +26,11 @@ Notes::Notes(const std::string& csv_key) {
 				_normal_note_row_num_lane0_base++;
 				_normalSpawnTime_lane0_base.emplace_back(justSpawnTime_ms[i]);
 			}
-			//ロングノーツの開始時間
-
 			else if (NoteType[i] == "LONG_START") {
 
 				_long_note_row_num_lane0_base++;
 				_longStartTime_lane0_base.emplace_back(justSpawnTime_ms[i]);
 			}
-			// ロングノーツの終了時間
-
 			else if (NoteType[i] == "LONG_END") {
 
 				_longEndTime_lane0_base.emplace_back(justSpawnTime_ms[i]);
@@ -99,8 +93,7 @@ Notes::Notes(const std::string& csv_key) {
 }
 
 
-
-Notes::Notes(float x1, float y1, float x_vel, float y_vel, float size, int color, bool active) {
+Notes::Notes(float x1, float y1, float x_vel, float y_vel, float size, int color, bool isActive) {
 
 	this->x1 = x1;
 	this->y1 = y1;
@@ -108,11 +101,11 @@ Notes::Notes(float x1, float y1, float x_vel, float y_vel, float size, int color
 	this->y_vel = y_vel;
 	this->size = size;
 	this->color = color;
-	this->active = active;
+	this->isActive = isActive;
 }
 
 
-Notes::Notes(float x1_long_start, float x1_long_end, float y1_long, float x_vel, float y_vel, float size_long, int color, bool active) {
+Notes::Notes(float x1_long_start, float x1_long_end, float y1_long, float x_vel, float y_vel, float size_long, int color, bool isActive) {
 
 	this->x1_long_start = x1_long_start;
 	this->x1_long_end = x1_long_end;
@@ -121,5 +114,5 @@ Notes::Notes(float x1_long_start, float x1_long_end, float y1_long, float x_vel,
 	this->y_vel = y_vel;
 	this->size_long = size_long;
 	this->color = color;
-	this->active = active;
+	this->isActive = isActive;
 }

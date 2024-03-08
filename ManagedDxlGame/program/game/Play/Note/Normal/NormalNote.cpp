@@ -4,14 +4,12 @@
 #include "../../ScenePlaySong.h"
 
 
-
 NormalNote::NormalNote(const std::string& csv_ref) : Notes(csv_ref) {
 
 	normal_note_0.reserve(_normal_note_row_num_lane0_base);
 	normal_note_1.reserve(_normal_note_row_num_lane1_base);
 	normal_note_2.reserve(_normal_note_row_num_lane2_base);
 	normal_note_3.reserve(_normal_note_row_num_lane3_base);
-
 
 	for (int row = 0; row < _normal_note_row_num_lane0_base; ++row) {
 
@@ -21,7 +19,7 @@ NormalNote::NormalNote(const std::string& csv_ref) : Notes(csv_ref) {
 		this->y_vel = 120.0f;     // y方向の速度
 		this->size = 1.f;         // サイズ
 		this->color = GetColor(255, 105, 180);  // 色
-		this->active = true;      // アクティブ状態
+		this->isActive = true;      // アクティブ状態
 
 		normal_note_0.emplace_back(
 
@@ -31,7 +29,7 @@ NormalNote::NormalNote(const std::string& csv_ref) : Notes(csv_ref) {
 			this->y_vel,
 			this->size,
 			this->color,
-			this->active
+			this->isActive
 		);
 	}
 
@@ -43,7 +41,7 @@ NormalNote::NormalNote(const std::string& csv_ref) : Notes(csv_ref) {
 		this->y_vel = 90.0f;
 		this->size = 1.f;
 		this->color = GetColor(255, 105, 180);
-		this->active = true;
+		this->isActive = true;
 
 		normal_note_1.emplace_back(
 
@@ -53,7 +51,7 @@ NormalNote::NormalNote(const std::string& csv_ref) : Notes(csv_ref) {
 			this->y_vel,
 			this->size,
 			this->color,
-			this->active
+			this->isActive
 		);
 	}
 
@@ -65,7 +63,7 @@ NormalNote::NormalNote(const std::string& csv_ref) : Notes(csv_ref) {
 		this->y_vel = 70.0f;
 		this->size = 1.f;
 		this->color = GetColor(255, 105, 180);
-		this->active = true;
+		this->isActive = true;
 
 		normal_note_2.emplace_back(
 
@@ -75,7 +73,7 @@ NormalNote::NormalNote(const std::string& csv_ref) : Notes(csv_ref) {
 			this->y_vel,
 			this->size,
 			this->color,
-			this->active
+			this->isActive
 		);
 	}
 
@@ -87,7 +85,7 @@ NormalNote::NormalNote(const std::string& csv_ref) : Notes(csv_ref) {
 		this->y_vel = 65.0f;
 		this->size = 1.f;
 		this->color = GetColor(255, 105, 180);
-		this->active = true;
+		this->isActive = true;
 
 		normal_note_3.emplace_back(
 
@@ -97,169 +95,62 @@ NormalNote::NormalNote(const std::string& csv_ref) : Notes(csv_ref) {
 			this->y_vel,
 			this->size,
 			this->color,
-			this->active
+			this->isActive
 		);
 	}
 }
 
 
+void NormalNote::UpdateNotes_DRY(std::vector<NormalNote>& normal_note, const double timer, std::vector<double> normalSpawnTime_eachLane, const float deltaTime, const int space) {
 
-void NormalNote::UpdateNotes(double _timer, float deltaTime) {
-
-
-	for (auto it_lane0 = normal_note_0.begin(); it_lane0 != normal_note_0.end(); it_lane0++) {
+	for (auto it_lane = normal_note.begin(); it_lane != normal_note.end(); it_lane++) {
 
 		// ノーツと当たり判定エリアの距離を取得
-		int lane_row = std::distance(normal_note_0.begin(), it_lane0);
+		int lane_row = std::distance(normal_note.begin(), it_lane);
 
-		if ((*it_lane0).active) {  // アクティブなら
+		if ((*it_lane).isActive) {  // アクティブなら
 
 			//　開始時間
-			if (_timer > _normalSpawnTime_lane0_base[std::distance(normal_note_0.begin(), it_lane0)]) {
+			if (timer > normalSpawnTime_eachLane[std::distance(normal_note.begin(), it_lane)]) {
 
-				(*it_lane0).RenderNotes();
+				(*it_lane).RenderNotes();
 
 				// ノーツの位置とサイズを更新
-				(*it_lane0).x1 += (*it_lane0).x_vel * 3 * deltaTime;    // x座標
-				(*it_lane0).y1 += (*it_lane0).y_vel * 3 * deltaTime;    // y座標
-				(*it_lane0).size += (*it_lane0).y_vel * 80 * deltaTime; // サイズ
+				(*it_lane).x1 += (*it_lane).x_vel * 3 * deltaTime;    // x座標
+				(*it_lane).y1 += (*it_lane).y_vel * 3 * deltaTime;    // y座標
+				(*it_lane).size += (*it_lane).y_vel * 80 * deltaTime; // サイズ
 			}
 
 			//　画面外に出たら
-			if ((*it_lane0).y1 > DXE_WINDOW_HEIGHT) {
+			if ((*it_lane).y1 > DXE_WINDOW_HEIGHT) {
 
-				if (std::next(it_lane0, 1) != normal_note_0.end()) {
+				if (std::next(it_lane, 1) != normal_note.end()) {
 
-					auto next = std::next(it_lane0, 1);
+					auto next = std::next(it_lane, 1);
 
 					// 次のノーツを元の位置に戻す
-					(*next).x1 = STARTPOS_X1;
+					(*next).x1 = STARTPOS_X1 + space;
 					(*next).y1 = STARTPOS_Y1;
 					(*next).size = 1.0f;
 				}
 
 				//　現在のノーツは無効化
-				(*it_lane0).active = false;
+				(*it_lane).isActive = false;
 			}
 
-			judgeZone->JudgeNoteHit_ByInputKey(normal_note_0, lane_row, _timer, _normalSpawnTime_lane0_base);
+			judgeZone->JudgeNoteHit_ByInputKey(normal_note, lane_row, timer, normalSpawnTime_eachLane);
 		}
 	}
-
-	for (auto it_lane1 = normal_note_1.begin(); it_lane1 != normal_note_1.end(); it_lane1++) {
-
-		// ノーツと当たり判定エリアの距離を取得
-		int lane_row = std::distance(normal_note_1.begin(), it_lane1);
-
-		if ((*it_lane1).active) {  // アクティブなら
-
-			//　開始時間
-			if (_timer > _normalSpawnTime_lane1_base[std::distance(normal_note_1.begin(), it_lane1)]) {
-
-				(*it_lane1).RenderNotes();
-
-				// ノーツの位置とサイズを更新
-				(*it_lane1).x1 += (*it_lane1).x_vel * 3 * deltaTime;    // x座標
-				(*it_lane1).y1 += (*it_lane1).y_vel * 3 * deltaTime;    // y座標
-				(*it_lane1).size += (*it_lane1).y_vel * 80 * deltaTime; // サイズ
-
-			}
-
-			if ((*it_lane1).y1 > DXE_WINDOW_HEIGHT) {
-
-				if (std::next(it_lane1, 1) != normal_note_1.end()) {
-
-					auto next = std::next(it_lane1, 1);
-
-					(*next).x1 = STARTPOS_X1 + noteSpace;
-					(*next).y1 = STARTPOS_Y1;
-					(*next).size = 1.0f;
-				}
-
-				(*it_lane1).active = false;
-			}
-
-			judgeZone->JudgeNoteHit_ByInputKey(normal_note_1, lane_row, _timer, _normalSpawnTime_lane1_base);
-		}
-	}
-
-	for (auto it_lane2 = normal_note_2.begin(); it_lane2 != normal_note_2.end(); it_lane2++) {
+}
 
 
-		// ノーツと当たり判定エリアの距離を取得
-		int lane_row = std::distance(normal_note_2.begin(), it_lane2);
 
-		if ((*it_lane2).active) {  // アクティブなら
+void NormalNote::UpdateNotes(const double& timer, const float& deltaTime) {
 
-			//　開始時間
-			if (_timer > _normalSpawnTime_lane2_base[std::distance(normal_note_2.begin(), it_lane2)]) {
-
-				(*it_lane2).RenderNotes();
-
-				// ノーツの位置とサイズを更新
-				(*it_lane2).x1 += (*it_lane2).x_vel * 3 * deltaTime;    // x座標
-				(*it_lane2).y1 += (*it_lane2).y_vel * 3 * deltaTime;    // y座標
-				(*it_lane2).size += (*it_lane2).y_vel * 80 * deltaTime; // サイズ
-			}
-
-
-			if ((*it_lane2).y1 > DXE_WINDOW_HEIGHT) {
-
-				if (std::next(it_lane2, 1) != normal_note_2.end()) {
-
-					auto next = std::next(it_lane2, 1);
-
-					// 無効になったノーツを元の位置に戻す
-					(*next).x1 = STARTPOS_X1 + (noteSpace * 2);
-					(*next).y1 = STARTPOS_Y1;
-					(*next).size = 1.0f;
-				}
-
-				(*it_lane2).active = false;
-			}
-
-			judgeZone->JudgeNoteHit_ByInputKey(normal_note_2, lane_row, _timer, _normalSpawnTime_lane2_base);
-		}
-	}
-
-	for (auto it_lane3 = normal_note_3.begin(); it_lane3 != normal_note_3.end(); it_lane3++) {
-
-
-		// ノーツと当たり判定エリアの距離を取得
-		int lane_row = std::distance(normal_note_3.begin(), it_lane3);
-
-		if ((*it_lane3).active) {  // アクティブなら
-
-			//　開始時間
-			if (_timer > _normalSpawnTime_lane3_base[std::distance(normal_note_3.begin(), it_lane3)]) {
-
-				(*it_lane3).RenderNotes();
-
-				// ノーツの位置とサイズを更新
-				(*it_lane3).x1 += it_lane3->x_vel * 3 * deltaTime;    // x座標
-				(*it_lane3).y1 += it_lane3->y_vel * 3 * deltaTime;    // y座標
-				(*it_lane3).size += it_lane3->y_vel * 80 * deltaTime; // サイズ
-
-			}
-
-			if ((*it_lane3).y1 > DXE_WINDOW_HEIGHT) {
-
-				if (std::next(it_lane3, 1) != normal_note_3.end()) {
-
-					auto next = std::next(it_lane3, 1);
-
-					// 無効になったノーツを元の位置に戻す
-					(*next).x1 = STARTPOS_X1 + (noteSpace * 3);
-					(*next).y1 = STARTPOS_Y1;
-					(*next).size = 1.0f;
-				}
-
-				(*it_lane3).active = false;
-			}
-
-			judgeZone->JudgeNoteHit_ByInputKey(normal_note_3, lane_row, _timer, _normalSpawnTime_lane3_base);
-		}
-	}
+	UpdateNotes_DRY(normal_note_0, timer, _normalSpawnTime_lane0_base, deltaTime);
+	UpdateNotes_DRY(normal_note_1, timer, _normalSpawnTime_lane1_base, deltaTime, noteSpace);
+	UpdateNotes_DRY(normal_note_2, timer, _normalSpawnTime_lane2_base, deltaTime, noteSpace * 2);
+	UpdateNotes_DRY(normal_note_3, timer, _normalSpawnTime_lane3_base, deltaTime, noteSpace * 3);
 }
 
 

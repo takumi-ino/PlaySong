@@ -7,8 +7,6 @@ class NoteDataCsv
 {
 public:
 
-
-
 	static NoteDataCsv& GetInstance() {
 
 		static NoteDataCsv instance;
@@ -18,13 +16,9 @@ public:
 
 	void SetNoteKeyValue();
 
-
 	std::vector<std::vector<tnl::CsvCell>>& LoadNoteCsv(const std::string& key);
 
 private:
-
-	NoteDataCsv() {}
-
 
 	std::string GetNoteCsvMapKey(const std::string& key);
 
@@ -32,4 +26,3 @@ private:
 
 	std::vector<std::vector<tnl::CsvCell>> _csvFile;
 };
-

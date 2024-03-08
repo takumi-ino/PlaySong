@@ -1,7 +1,7 @@
 #pragma once
 #include "../../dxlib_ext/dxlib_ext.h"
 
-#define PLAYLIST_NUM 4 //現在のプレイリスト数
+constexpr static int PLAYLIST_NUM = 4; //現在のプレイリスト数
 
 // 曲ハンドル--------------
 extern int songList[];

@@ -16,14 +16,12 @@ SelectSongMenu* _selectSongMenu = nullptr;
 void gameStart() {
 	srand(100);
 
-
 	SetDrawScreen(DX_SCREEN_BACK);	
 	// ウィンドウサイズ変更可能にする関数
 	SetWindowSizeChangeEnableFlag(TRUE, TRUE);
 	ChangeWindowMode(true);
 	// ウィンドウ名設定
 	SetWindowText("Play Song");
-
 
 	// フォント追加
 	tnl::AddFontTTF("851Gkktt_005.ttf");
@@ -53,6 +51,9 @@ void gameMain(float deltaTime) {
 
 	// シーン遷移   各シーンのインスタンスを管理・制御
 	SceneManager::GetInstance()->Update(deltaTime); 
+
+	//SetFontSize(30);
+    //DrawStringEx(10, 690, -1, "%f.2", GetFPS());
 }
 
 //------------------------------------------------------------------------------------------------------------
@@ -62,6 +63,5 @@ void gameEnd() {
 	delete _selectSongMenu;
 	_selectSongMenu = nullptr;
 
-	SoundManager::GetInstance()->Destroy();
 	SceneManager::GetInstance()->Destroy();
 }

@@ -5,28 +5,37 @@
 #include "../Main.h"
 
 
+namespace {
+
+	const int _maxAlphaSize = 38;
+
+	const int _titleLog_x = 444;
+	const int _START_TEXT_POS_X = 580;
+	const int _start_text_y = 480;
+}
+
+
 void Title::Update(float deltaTime) {
 
 	sequence.update(deltaTime);
 
 	// ”wŒiFƒZƒbƒg
-	if (_fadeIO) {
+	if (fadeIO) {
 
-		int alpha = (sequence.getProgressTime() / 1.0f * 255.0f);
+		int brightnessAlpha = (sequence.getProgressTime() / 1.0f * 255.0f);
 
-		if (alpha >= _maxAlphaSize)  alpha = _maxAlphaSize;
+		if (brightnessAlpha >= _maxAlphaSize)  
+			brightnessAlpha = _maxAlphaSize;
 
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, brightnessAlpha);
 		DrawExtendGraph(0, 0, DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT, whiteImg, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 	}
 
 
-	_alpha = (_alpha < 360.0f) ? _alpha += 0.1f : _alpha = 0.0f;
+	brightnessAlpha = (brightnessAlpha < 360.0f) ? brightnessAlpha += 0.1f : brightnessAlpha = 0.0f;
 
-
-	float flash = sin(_alpha) * 120.f;
-
+	float flash = sin(brightnessAlpha) * 120.f;
 
 	SetFontSize(60);
 	DrawStringEx(_titleLog_x, DXE_WINDOW_HEIGHT / 4, -1, "Play Song");
@@ -35,16 +44,13 @@ void Title::Update(float deltaTime) {
 }
 
 
-
-
 bool Title::SeqIdle(float deltaTime) {
 
 	if (sequence.isStart()) {
 
-		_fadeIO = true;
+		fadeIO = true;
 		whiteImg = LoadGraph("graphics/white.bmp");
 	}
-
 
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN) || tnl::Input::IsPadDownTrigger(ePad::KEY_1)) {
 
@@ -53,6 +59,7 @@ bool Title::SeqIdle(float deltaTime) {
 			PlaySoundMem(titleToSelectMenu_hdl, DX_PLAYTYPE_BACK, TRUE);
 			soundPlayed = true;
 		}
+
 		auto mgr = SceneManager::GetInstance();
 		mgr->SceneChange(new SelectSongMenu());
 		moveToSongSelect = true;

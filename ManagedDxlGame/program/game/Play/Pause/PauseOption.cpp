@@ -7,24 +7,32 @@
 #include "../../Manager/SoundManager.h"
 
 
-void PauseOption::UpdatePauseMenuCursor_ByInput() {
+namespace {
 
+	const int PAUSEOPTION_MAXITEM_NUM = 2;  // VOLUMEとSCREEN_EFFECT
+	const int EFFECTOPTION_MAXITEM_NUM = 3; // low, medium, high
+
+	const int LEFTSIDE = 50;
+	const int UPSIDE = 100;
+}
+
+
+void PauseOption::UpdatePauseMenuCursor_ByInput() {
 
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_UP) || tnl::Input::IsPadDownTrigger(ePad::KEY_UP))
 	{
 		menuIndex--;
-		if (menuIndex < 0) menuIndex = MENU_INDEX - 1; // 末尾へ
+		if (menuIndex < 0) menuIndex = MENU_INDEX - 1;
 	}
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_DOWN) || tnl::Input::IsPadDownTrigger(ePad::KEY_DOWN))  // 下キー
+	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_DOWN) || tnl::Input::IsPadDownTrigger(ePad::KEY_DOWN))
 	{
 		menuIndex++;
-		if (menuIndex >= MENU_INDEX) menuIndex = 0;	   // 先頭へ
+		if (menuIndex >= MENU_INDEX) menuIndex = 0;
 	}
 }
 
 
 void PauseOption::RenderMenuItems_AndDescriptions() {
-
 
 	int rightSide = 500;
 	int r = -1, g = -1, b = -1, a = -1;
@@ -61,24 +69,26 @@ void PauseOption::RenderMenuItems_AndDescriptions() {
 }
 
 
+bool PauseOption::isRetryGame;
 
 void PauseOption::PickMenuItemByInput() {
-
 
 	if (menuIndex == 0) { // ゲーム再開	
 
 		PlaySong::_timer->Resume();
-		PlaySong::isPaused = false;
 	}
-	if (menuIndex == 1) { showOption = true; }  // オプションを開く
+
+	if (menuIndex == 1) { // オプションを開く
+	 
+		showOption = true; 
+	}  
+
 	if (menuIndex == 2) { // リトライ
-		PlaySong::isPaused = false;
 
 		isRetryGame = true;
-		SetCurrentPositionSoundMem(0, songList[PlaySong::songIndex]);
 	}
+
 	if (menuIndex == 3) { // 曲選択へ戻る
-		PlaySong::isPaused = false;
 
 		StopSoundMem(pause_BGM_hdl);  // ポーズ画面BGM停止
 		SetCurrentPositionSoundMem(0, pause_BGM_hdl);
@@ -90,17 +100,21 @@ void PauseOption::PickMenuItemByInput() {
 
 void PauseOption::UpdatePauseOptionCursor_ByInput() {
 
-	if (!isAdjustVolume && !selectEffColor) {
+	if (!isAdjustVolume && !selectEffectColor) {
 
 		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_UP) || tnl::Input::IsPadDownTrigger(ePad::KEY_UP))
 		{
 			optionIndex--;
-			if (optionIndex < 0) optionIndex = PAUSEOPTION_MAXITEM_NUM - 1; // 末尾へ
+
+			if (optionIndex < 0) 
+				optionIndex = PAUSEOPTION_MAXITEM_NUM - 1;
 		}
 		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_DOWN) || tnl::Input::IsPadDownTrigger(ePad::KEY_DOWN))
 		{
 			optionIndex++;
-			if (optionIndex >= PAUSEOPTION_MAXITEM_NUM) optionIndex = 0;	// 先頭へ
+
+			if (optionIndex >= PAUSEOPTION_MAXITEM_NUM) 
+				optionIndex = 0;
 		}
 	}
 }
@@ -135,20 +149,24 @@ void PauseOption::GoNextOrGoBack() {
 
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN) || tnl::Input::IsPadDownTrigger(ePad::KEY_1)) { // 決定（エンター）
 
-		if (optionIndex == 0) isAdjustVolume = true;        // Volume
-		else if (optionIndex == 1) selectEffColor = true;   // ScreenEffect
+		if (optionIndex == 0)
+			isAdjustVolume = true;        // Volume
+		else if (optionIndex == 1)
+			selectEffectColor = true;   // ScreenEffect
 	}
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_BACK) || tnl::Input::IsPadDownTrigger(ePad::KEY_0)) {  // 戻る（バックスペース）
 
-		if (!isAdjustVolume && !selectEffColor) {
+		if (!isAdjustVolume && !selectEffectColor) {
 			PauseOption::showOption = false;
 			SetFontSize(35);
 		}
-		if (optionIndex == 0) isAdjustVolume = false;
-		else if (optionIndex == 1) selectEffColor = false;
+
+		if (optionIndex == 0) 
+			isAdjustVolume = false;
+		else if (optionIndex == 1) 
+			selectEffectColor = false;
 	}
 }
-
 
 
 void PauseOption::AdjustVolumeByInput() {
@@ -158,23 +176,31 @@ void PauseOption::AdjustVolumeByInput() {
 		if (tnl::Input::IsKeyDown(eKeys::KB_RIGHT) || tnl::Input::IsPadDown(ePad::KEY_RIGHT)) {
 
 			volumeIndex += 3; // 座標範囲 0～300
-			volumeNum++;     // 音量範囲 0～255
+			volumeNum++;      // 音量範囲 0～255
+
 			ChangeVolumeSoundMem(volumeNum * 255 / 100, songList[PlaySong::songIndex]); // 音量調整
 			ChangeVolumeSoundMem(volumeNum * 255 / 100, pause_BGM_hdl);
 		}
+
 		if (tnl::Input::IsKeyDown(eKeys::KB_LEFT) || tnl::Input::IsPadDown(ePad::KEY_LEFT)) {
 
 			volumeIndex -= 3;
 			volumeNum--;
+
 			ChangeVolumeSoundMem(volumeNum * 255 / 100, songList[PlaySong::songIndex]);
 			ChangeVolumeSoundMem(volumeNum * 255 / 100, pause_BGM_hdl);
 		}
 
-		if (volumeIndex <= 0) volumeIndex = 0;         // 座標
-		else if (volumeIndex >= 350) volumeIndex = 350;
+		if (volumeIndex <= 0)
+			volumeIndex = 0;         // 座標
+		else if (volumeIndex >= 350) 
+			volumeIndex = 350;
 
-		if (volumeNum <= 0) volumeNum = 0;           // 音量
-		else if (volumeNum >= 100) volumeNum = 100;
+		if (volumeNum <= 0)
+			volumeNum = 0;           // 音量
+		else if (volumeNum >= 100) 
+			volumeNum = 100;
+
 		volNum_color = GetColor(0, 255, 255);
 	}
 }
@@ -182,7 +208,6 @@ void PauseOption::AdjustVolumeByInput() {
 
 
 void PauseOption::UpdateSelectEffectCursor_ByInput() {
-
 
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RIGHT) || tnl::Input::IsPadDownTrigger(ePad::KEY_RIGHT)) {
 
@@ -199,7 +224,6 @@ void PauseOption::UpdateSelectEffectCursor_ByInput() {
 
 
 void PauseOption::ChangeSelectEffectColorAndBrightness(int& eff1_color,int& eff2_color, int& eff3_color) {
-
 
 	for (int i = 0; i < EFFECTOPTION_MAXITEM_NUM; i++) {
 
@@ -235,9 +259,8 @@ void PauseOption::RenderAdjustVolumeFunc() {
 
 void PauseOption::RenderLowMediumHighWord(int& eff1_color,int& eff2_color,int& eff3_color) {
 
-
 	// 画面の明るさ
-	DrawStringEx(LEFTSIDE, UPSIDE + 210, eff1_color, "Low");      // 低
+	DrawStringEx(LEFTSIDE, UPSIDE + 210, eff1_color, "Low");           // 低
 	DrawStringEx(LEFTSIDE + 140, UPSIDE + 210, eff2_color, "Medium");  // 中
-	DrawStringEx(LEFTSIDE + 340, UPSIDE + 210, eff3_color, "High");   // 高
+	DrawStringEx(LEFTSIDE + 340, UPSIDE + 210, eff3_color, "High");    // 高
 }
