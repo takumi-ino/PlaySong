@@ -262,13 +262,13 @@ void PlaySong::Render() {
 }
 
 
+bool PlaySong::moveToSongSelect;
+
 
 void PlaySong::Update(float delta_time) {
 
 	sequence.update(delta_time);
 
-	_timer->UpdateDeltaTime();
-	_timer->GetDeltaTime();
 
 	deltaTime_ref = delta_time;
 
@@ -340,9 +340,6 @@ void PlaySong::Update(float delta_time) {
 		}
 
 		showInfo_beforeStart_playSong = true;
-		break;
-	case 2:
-		moveToSongSelect = true;
 		break;
 	}
 }

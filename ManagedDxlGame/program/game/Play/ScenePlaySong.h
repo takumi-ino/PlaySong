@@ -74,6 +74,7 @@ public:
 	static int           currentState;                 // メニュー画面のステート状態
 	static int           songIndex;                    // 曲番号
 	static bool          isPaused;
+	static bool          moveToSongSelect;
 	static bool          moveToResult;
 	static bool          isRetryGame;
 
@@ -96,5 +97,4 @@ private:
 
 	bool showInfo_beforeStart_playSong = true;
 	bool isFadeIn = false;
-	bool moveToSongSelect = false;
 };

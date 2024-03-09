@@ -112,7 +112,7 @@ void Result::DrawResult(const float x, const float y, const int fontSize, const 
 
 	if (!value.empty()) {
 
-		DrawStringEx(x, y + fontSize * 0.5, -1, value.c_str());
+		DrawStringEx(x, y + fontSize * 0.5f, -1, value.c_str());
 	}
 }
 

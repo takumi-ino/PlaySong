@@ -22,7 +22,7 @@ void Title::Update(float deltaTime) {
 	// îwåiêFÉZÉbÉg
 	if (fadeIO) {
 
-		int brightnessAlpha = (sequence.getProgressTime() / 1.0f * 255.0f);
+		int brightnessAlpha = static_cast<int>((sequence.getProgressTime() / 1.0f * 255.0f));
 
 		if (brightnessAlpha >= _maxAlphaSize)  
 			brightnessAlpha = _maxAlphaSize;
@@ -40,7 +40,7 @@ void Title::Update(float deltaTime) {
 	SetFontSize(60);
 	DrawStringEx(_titleLog_x, DXE_WINDOW_HEIGHT / 4, -1, "Play Song");
 	SetFontSize(30);
-	DrawStringEx(_START_TEXT_POS_X, _start_text_y, GetColor(flash, flash, flash), "start");
+	DrawStringEx(_START_TEXT_POS_X, _start_text_y, GetColor((int)flash, (int)flash, (int)flash), "start");
 }
 
 

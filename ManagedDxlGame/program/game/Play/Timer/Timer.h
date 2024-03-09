@@ -18,10 +18,6 @@ public:
 
 	double Elapsed();
 
-	void UpdateDeltaTime();
-
-	const double GetDeltaTime();
-
 public:
 
 	bool isPaused{};

@@ -94,6 +94,9 @@ void PauseOption::PickMenuItemByInput() {
 
 		StopSoundMem(pause_BGM_hdl);  // É|Å[ÉYâÊñ BGMí‚é~
 		SetCurrentPositionSoundMem(0, pause_BGM_hdl);
+
+		PlaySong::isPaused = false;
+		PlaySong::moveToSongSelect = true;
 	}
 }
 

@@ -45,17 +45,3 @@ void Timer::Reset() {
 	start_time = std::chrono::high_resolution_clock::now();
 	paused_time = start_time;
 }
-
-
-void Timer::UpdateDeltaTime() {
-
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	deltaTime = std::chrono::duration<double>(currentTime - lastFrameTime).count();
-	lastFrameTime = currentTime;
-}
-
-
-double const Timer::GetDeltaTime() {
-
-	return deltaTime;
-}
