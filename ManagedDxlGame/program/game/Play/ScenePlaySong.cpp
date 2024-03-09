@@ -27,8 +27,9 @@ namespace {
 }
 
 
-
 PlaySong::PlaySong(const char* title, const char* level, const int index, const int levelIdx) {
+
+	RevertAllChanges();
 
 	songName = title;
 	songLevel = level;
@@ -129,7 +130,7 @@ void PlaySong::PlaySongUntilSongEnd() {
 void PlaySong::RenderMetaData() {
 
 	SetFontSize(25);
-	DrawStringEx(DXE_WINDOW_WIDTH - 240, 70, -1, songName); // 曲名
+	DrawStringEx(DXE_WINDOW_WIDTH - 240, 70, -1, songName);  // 曲名
 	DrawStringEx(DXE_WINDOW_WIDTH - 240, 95, -1, songLevel); // 難易度
 }
 
@@ -219,7 +220,60 @@ void PlaySong::Render() {
 
 			ShowSongInfo_BeforeStart();
 		}
+
 		break;
+	case 1:
+
+		if (!isPaused) {
+
+			//SetFontSize(35); // タイマー表示(左上)
+			//std::string time = std::to_string(_timer->currentTime);
+			//DrawString(50, 50, time.c_str(), -1);
+
+			RenderMetaData(); // 曲情報描画
+
+			_scoreCombo->RenderCombo();    // コンボ描画
+			_scoreCombo->RenderScore();    // スコア描画
+
+			judgeZone->RenderMap();        // 全体エリア描画
+			judgeZone->RenderJudgeZones();
+
+			DrawString(5, 5, "PAUSE：P", -1);
+		}
+		else {
+
+			if (!_pauseOption->showOption) {
+
+				// 右半分に表示の備考
+				_pauseOption->RenderMenuItems_AndDescriptions();
+			}
+			else {
+
+				// low, medium, highの色 
+				int eff1_color = -1, eff2_color = -1, eff3_color = -1;
+
+				SetFontSize(33);
+				_pauseOption->RenderAdjustVolumeObject();
+				_pauseOption->RenderLowMediumHighWord(eff1_color, eff2_color, eff3_color);
+			}
+		}
+		break;
+	}
+}
+
+
+
+void PlaySong::Update(float delta_time) {
+
+	sequence.update(delta_time);
+
+	_timer->UpdateDeltaTime();
+	_timer->GetDeltaTime();
+
+	deltaTime_ref = delta_time;
+
+	switch (currentState)
+	{
 	case 1:
 
 		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_P) ||
@@ -230,34 +284,21 @@ void PlaySong::Render() {
 
 		if (!isPaused) {
 
-			if (!moveToResult)
+			if (!moveToResult) {
+
 				PlaySongUntilSongEnd();  // 音源
+			}
 
-			//SetFontSize(35); // タイマー表示(左上)
-			//std::string time = std::to_string(_timer->currentTime);
-			//DrawString(50, 50, time.c_str(), -1);
-
-			StopSoundMem(pause_BGM_hdl);  // ポーズ画面BGM停止
+			// ポーズ画面BGM停止
+			StopSoundMem(pause_BGM_hdl);
 			SetCurrentPositionSoundMem(0, pause_BGM_hdl);
-
-
-			RenderMetaData(); // 曲情報描画
-
-			_scoreCombo->RenderCombo(); // コンボ描画
-			_scoreCombo->RenderScore(); // スコア描画
 
 			// 曲が終わったら問答無用でリザルトへ
 			CheckIfSongEndByTimer();
 
-			judgeZone->RenderMap(); // 全体エリア描画
-			judgeZone->RenderJudgeZones();
-
-			//　ノーツ及び当たり判定エリア処理。この関数内で全て行っている。
+			// ノーツ及び当たり判定エリア処理。この関数内で全て行う
 			_normal_noteRef->UpdateNotes(_timer->currentTime, GetDeltaTime());
 			_long_noteRef->UpdateNotes(_timer->currentTime, GetDeltaTime());
-
-			DrawStringEx(5, 5, -1, "PAUSE：P");
-			break;
 		}
 		else
 		{
@@ -270,9 +311,6 @@ void PlaySong::Render() {
 			if (!_pauseOption->showOption) {
 
 				_pauseOption->UpdatePauseMenuCursor_ByInput();
-
-				// 右半分に表示の備考
-				_pauseOption->RenderMenuItems_AndDescriptions();
 
 				// 決定キーが押された場合
 				if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN) || tnl::Input::IsPadDownTrigger(ePad::KEY_1)) {
@@ -293,18 +331,14 @@ void PlaySong::Render() {
 				// low, medium, highの色 
 				int eff1_color = -1, eff2_color = -1, eff3_color = -1;
 
-
 				if (_pauseOption->selectEffectColor) { // low, medium, highの文字列の色の変更
 
 					_pauseOption->UpdateSelectEffectCursor_ByInput();
 					_pauseOption->ChangeSelectEffectColorAndBrightness(eff1_color, eff2_color, eff3_color);
 				}
-
-				SetFontSize(33);
-				_pauseOption->RenderAdjustVolumeFunc();
-				_pauseOption->RenderLowMediumHighWord(eff1_color, eff2_color, eff3_color);
 			}
 		}
+
 		showInfo_beforeStart_playSong = true;
 		break;
 	case 2:
@@ -314,30 +348,21 @@ void PlaySong::Render() {
 }
 
 
+bool PlaySong::isRetryGame;
 
-void PlaySong::Update(float delta_time) {
 
-	sequence.update(delta_time);
-
-	_timer->UpdateDeltaTime();
-	_timer->GetDeltaTime();
-
-	deltaTime_ref = delta_time;
+bool PlaySong::SeqIdle(float delta_time) {
 
 	if (moveToSongSelect) {
 
-		ResetGame();
+		RevertAllChanges();
 
 		// 選曲シーンへ
 		auto mgr = SceneManager::GetInstance();
 		mgr->SceneChange(new SelectSongMenu());
 	}
 
-	if (PauseOption::isRetryGame) {
-
-		ResetGame();
-
-		PauseOption::isRetryGame = false;
+	if (isRetryGame) {
 
 		auto mgr = SceneManager::GetInstance();
 		mgr->SceneChange(new PlaySong(
@@ -355,7 +380,8 @@ void PlaySong::Update(float delta_time) {
 
 		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN)) {
 
-			ResetGame();
+			RevertAllChanges();
+			Destroy();
 
 			auto mgr = SceneManager::GetInstance();
 			mgr->SceneChange(new Result(
@@ -369,34 +395,32 @@ void PlaySong::Update(float delta_time) {
 				songName,
 				songLevel)
 			); // 選んだ曲の番号 を PlaySongシーンに渡す
+
+			delete _scoreCombo;
+			_scoreCombo = nullptr;
 		}
 	}
-}
 
-
-bool PlaySong::SeqIdle(float delta_time) {
 	return true;
 }
 
 
-void PlaySong::ResetGame()
+void PlaySong::RevertAllChanges()
 {
 	StopSoundMem(songList[songIndex]);
 	SetCurrentPositionSoundMem(0, songList[songIndex]);
 	ClearDrawScreen();
 
 	isPaused = false;
+	isRetryGame = false;
 	moveToResult = false;
 	moveToSongSelect = false;
 
-	Destroy();
+	currentState = 0;
 }
 
 
 void PlaySong::Destroy() {
-
-	delete _scoreCombo;
-	_scoreCombo = nullptr;
 
 	delete _pauseOption;
 	_pauseOption = nullptr;

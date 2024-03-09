@@ -22,12 +22,14 @@ void PauseOption::UpdatePauseMenuCursor_ByInput() {
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_UP) || tnl::Input::IsPadDownTrigger(ePad::KEY_UP))
 	{
 		menuIndex--;
-		if (menuIndex < 0) menuIndex = MENU_INDEX - 1;
+		if (menuIndex < 0)
+			menuIndex = MENU_INDEX - 1;
 	}
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_DOWN) || tnl::Input::IsPadDownTrigger(ePad::KEY_DOWN))
 	{
 		menuIndex++;
-		if (menuIndex >= MENU_INDEX) menuIndex = 0;
+		if (menuIndex >= MENU_INDEX) 
+			menuIndex = 0;
 	}
 }
 
@@ -42,40 +44,40 @@ void PauseOption::RenderMenuItems_AndDescriptions() {
 		if (i == menuIndex && menuIndex == 0)	// ゲーム再開
 		{
 			r = GetColor(255, 255, 0);
-			DrawStringEx(rightSide, DXE_WINDOW_HEIGHT / 2 - 50, -1, "You Ready?");
+			DrawString(rightSide, DXE_WINDOW_HEIGHT / 2 - 50, "You Ready?", -1);
 		}
 		else if (i == menuIndex && menuIndex == 1)	// オプション
 		{
 			g = GetColor(255, 255, 0);
-			DrawStringEx(rightSide, DXE_WINDOW_HEIGHT / 2 - 50, -1, "You can Fix kind of Settings");
+			DrawString(rightSide, DXE_WINDOW_HEIGHT / 2 - 50, "You can Fix kind of Settings", -1);
 		}
 		else if (i == menuIndex && menuIndex == 2)	// 初めからやり直す
 		{
 			b = GetColor(255, 255, 0);
-			DrawStringEx(rightSide, DXE_WINDOW_HEIGHT / 2 - 50, -1, "Try again,\n I'm sure you can do it");
+			DrawString(rightSide, DXE_WINDOW_HEIGHT / 2 - 50, "Try again,\n I'm sure you can do it", -1);
 		}
 		else if (i == menuIndex && menuIndex == 3)	// 選択中の曲なら色を変える
 		{
 			a = GetColor(255, 255, 0);
-			DrawStringEx(rightSide, DXE_WINDOW_HEIGHT / 2 - 50, -1, "That's ok! We'll be waiting \n for your next challenge");
+			DrawString(rightSide, DXE_WINDOW_HEIGHT / 2 - 50, "That's ok! We'll be waiting \n for your next challenge", -1);
 		}
+
 		//-------------------------------------------- 
 		int leftSide = 140;
-		DrawStringEx(leftSide, DXE_WINDOW_HEIGHT / 3 - 30, r, "CONTINUE");
-		DrawStringEx(leftSide, DXE_WINDOW_HEIGHT / 3, g, "OPTION");
-		DrawStringEx(leftSide, DXE_WINDOW_HEIGHT / 3 + 30, b, "RESTART");
-		DrawStringEx(leftSide, DXE_WINDOW_HEIGHT / 3 + 60, a, "QUIT");
+		DrawString(leftSide, DXE_WINDOW_HEIGHT / 3 - 30, "CONTINUE", r);
+		DrawString(leftSide, DXE_WINDOW_HEIGHT / 3,      "OPTION", g);
+		DrawString(leftSide, DXE_WINDOW_HEIGHT / 3 + 30, "RESTART", b);
+		DrawString(leftSide, DXE_WINDOW_HEIGHT / 3 + 60, "QUIT", a);
 	}
 }
 
-
-bool PauseOption::isRetryGame;
 
 void PauseOption::PickMenuItemByInput() {
 
 	if (menuIndex == 0) { // ゲーム再開	
 
 		PlaySong::_timer->Resume();
+		PlaySong::isPaused = false;
 	}
 
 	if (menuIndex == 1) { // オプションを開く
@@ -85,17 +87,15 @@ void PauseOption::PickMenuItemByInput() {
 
 	if (menuIndex == 2) { // リトライ
 
-		isRetryGame = true;
+		PlaySong::isRetryGame = true;
 	}
 
 	if (menuIndex == 3) { // 曲選択へ戻る
 
 		StopSoundMem(pause_BGM_hdl);  // ポーズ画面BGM停止
 		SetCurrentPositionSoundMem(0, pause_BGM_hdl);
-		PlaySong::currentState = 2;
 	}
 }
-
 
 
 void PauseOption::UpdatePauseOptionCursor_ByInput() {
@@ -120,7 +120,6 @@ void PauseOption::UpdatePauseOptionCursor_ByInput() {
 }
 
 
-
 void PauseOption::ChangePauseOptionColor() {
 
 	int opt1_color = -1, opt2_color = -1;
@@ -128,7 +127,8 @@ void PauseOption::ChangePauseOptionColor() {
 	for (int i = 0; i < PAUSEOPTION_MAXITEM_NUM; i++) {
 
 		if (i == optionIndex && optionIndex == 0)
-			opt1_color = GetColor(255, 255, 0);    // Screen Effectの色					
+			opt1_color = GetColor(255, 255, 0);    // Screen Effectの色	
+
 		else if (i == optionIndex && optionIndex == 1)
 			opt2_color = GetColor(255, 255, 0);    // Volumeの色
 	}
@@ -138,11 +138,10 @@ void PauseOption::ChangePauseOptionColor() {
 
 	SetFontSize(50);
 	// 音量調整
-	DrawStringEx(x1_opt1, y1_opt1, opt1_color, "Volume");
+	DrawString(x1_opt1, y1_opt1, "Volume", opt1_color);
 	// 明るさ調整
-	DrawStringEx(x1_opt2, y1_opt2, opt2_color, "Screen Effect");
+	DrawString(x1_opt2, y1_opt2, "Screen Effect", opt2_color);
 }
-
 
 
 void PauseOption::GoNextOrGoBack() {
@@ -151,6 +150,7 @@ void PauseOption::GoNextOrGoBack() {
 
 		if (optionIndex == 0)
 			isAdjustVolume = true;        // Volume
+
 		else if (optionIndex == 1)
 			selectEffectColor = true;   // ScreenEffect
 	}
@@ -163,6 +163,7 @@ void PauseOption::GoNextOrGoBack() {
 
 		if (optionIndex == 0) 
 			isAdjustVolume = false;
+
 		else if (optionIndex == 1) 
 			selectEffectColor = false;
 	}
@@ -192,12 +193,14 @@ void PauseOption::AdjustVolumeByInput() {
 		}
 
 		if (volumeIndex <= 0)
-			volumeIndex = 0;         // 座標
+			volumeIndex = 0;         // 座標変更
+
 		else if (volumeIndex >= 350) 
 			volumeIndex = 350;
 
 		if (volumeNum <= 0)
-			volumeNum = 0;           // 音量
+			volumeNum = 0;           // 音量変更
+
 		else if (volumeNum >= 100) 
 			volumeNum = 100;
 
@@ -206,21 +209,21 @@ void PauseOption::AdjustVolumeByInput() {
 }
 
 
-
 void PauseOption::UpdateSelectEffectCursor_ByInput() {
 
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RIGHT) || tnl::Input::IsPadDownTrigger(ePad::KEY_RIGHT)) {
 
 		effectIndex++;
-		if (effectIndex >= (EFFECTOPTION_MAXITEM_NUM)) effectIndex = 0;
+		if (effectIndex >= (EFFECTOPTION_MAXITEM_NUM)) 
+			effectIndex = 0;
 	}
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_LEFT) || tnl::Input::IsPadDownTrigger(ePad::KEY_LEFT)) {
 
 		effectIndex--;
-		if (effectIndex < 0) effectIndex = EFFECTOPTION_MAXITEM_NUM - 1;
+		if (effectIndex < 0) 
+			effectIndex = EFFECTOPTION_MAXITEM_NUM - 1;
 	}
 }
-
 
 
 void PauseOption::ChangeSelectEffectColorAndBrightness(int& eff1_color,int& eff2_color, int& eff3_color) {
@@ -246,15 +249,13 @@ void PauseOption::ChangeSelectEffectColorAndBrightness(int& eff1_color,int& eff2
 }
 
 
-
-void PauseOption::RenderAdjustVolumeFunc() {
+void PauseOption::RenderAdjustVolumeObject() {
 
 	volume_str = std::to_string(volumeNum);
 	DrawStringEx(LEFTSIDE + 380, UPSIDE + 50, volNum_color, volume_str.c_str());
 	DrawBox(LEFTSIDE, UPSIDE + 60, LEFTSIDE + 350, UPSIDE + 70, -1, true);
 	DrawCircle(LEFTSIDE + volumeIndex, UPSIDE + 65, 10, -1, true);
 }
-
 
 
 void PauseOption::RenderLowMediumHighWord(int& eff1_color,int& eff2_color,int& eff3_color) {

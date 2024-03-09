@@ -17,7 +17,6 @@ namespace {
 
 	const int _LEVELSHAPES_X_POS = 335;  // 難易度文字列を囲う図形
 
-
 	// プレイシーンに飛ぶ前に表示する、選択した曲名の X軸
 	const int _SELECTED_SONG_TEXT_POS_X = 355;
 	const int _SELECTED_SONG_TEXT_POS_Y = 120;
@@ -64,7 +63,6 @@ const char* SelectSongMenu::_songGenre[PLAYLIST_NUM] =
 	"アニソン"
 };
 
-
 const char* SelectSongMenu::_songGenreRefAll[GENRE_NUM] =
 {
 	"クラシック",
@@ -76,7 +74,6 @@ const char* SelectSongMenu::_songGenreRefAll[GENRE_NUM] =
 	"ゲームミュージック"
 };
 
-
 const char* SelectSongMenu::_songLevels[4] =
 {
 	"EASY",
@@ -86,50 +83,7 @@ const char* SelectSongMenu::_songLevels[4] =
 };
 
 
-void SelectSongMenu::SongGenreTotalCount() {
-
-	// 追加済みプレイリスト
-	for (int i = 0; i < PLAYLIST_NUM; i++)
-	{
-		// 全曲ジャンル
-		for (int j = 0; j < GENRE_NUM; j++)
-		{
-			// ジャンル名が一致したらカウントを増やす
-			if (strcmp(_songGenre[i], _songGenreRefAll[j]) == 0)
-			{
-				genreCount[j]++;
-				break; // 一致したらループを抜ける
-			}
-		}
-	}
-}
-
-
-
-void SelectSongMenu::Render_TotalSongGenreList() {
-
-
-	// ジャンルと曲数を表示  左側縦方向
-	for (int i = 0; i < GENRE_NUM; i++)
-	{
-		if (show_finalCheck_before_startPlaySong) SetDrawBlendMode(DX_BLENDMODE_ALPHA, dimScreen_alphaSize);
-
-		if (strcmp(	 // 選択中の曲のジャンルなら色を変える
-			_songGenre[songIndex],
-			_songGenreRefAll[i]) == 0)
-		{
-			SetDrawBright(0, 255, 0); // 色を緑にする
-		}
-
-		// ジャンルと曲数を表示する
-		DrawFormatString(50, 20 + i * 33, -1, "%s：%d", _songGenreRefAll[i], genreCount[i]);
-		SetDrawBright(255, 255, 255); // 色を白に戻す
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-	}
-}
-
-
-
+// 入力----------------------------------------------------------------------------------------------------
 void SelectSongMenu::SelectingSongByInput() {
 
 	if (songSelect) {
@@ -142,7 +96,9 @@ void SelectSongMenu::SelectingSongByInput() {
 			SetCurrentPositionSoundMem(0, songList[songIndex]);
 
 			songIndex--;
-			if (songIndex < 0) songIndex = PLAYLIST_NUM - 1;
+
+			if (songIndex < 0) 
+				songIndex = PLAYLIST_NUM - 1;
 		}
 		// 下キー
 		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_DOWN) || tnl::Input::IsPadDownTrigger(ePad::KEY_DOWN))
@@ -152,11 +108,12 @@ void SelectSongMenu::SelectingSongByInput() {
 			SetCurrentPositionSoundMem(0, songList[songIndex]);
 
 			songIndex++;
-			if (songIndex >= PLAYLIST_NUM) songIndex = 0;
+
+			if (songIndex >= PLAYLIST_NUM) 
+				songIndex = 0;
 		}
 	}
 }
-
 
 
 void SelectSongMenu::PickOneSongByInput() {
@@ -190,22 +147,17 @@ void SelectSongMenu::PickOneSongByInput() {
 
 			moveToPlayScene = true;
 
-
-			auto mgr = SceneManager::GetInstance();
-			mgr->SceneChange(new PlaySong(
-				_songTitle[songIndex],     //選択曲
-				_songLevels[levelIndex],  //選択難易度、
-				songIndex, levelIndex)); // 選んだ曲の番号 を PlaySongシーンに渡す
+			MoveToScenePlaySong();
 		}
 	}
 
-	if (moveToPlayScene) soundPlayed = false;
+	if (moveToPlayScene)
+		soundPlayed = false;
 }
 
 
 
 void SelectSongMenu::BackToPreviousByInput() {
-
 
 	// キャンセルキーが押された場合
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_BACK) || tnl::Input::IsPadDownTrigger(ePad::KEY_0))
@@ -230,7 +182,6 @@ void SelectSongMenu::BackToPreviousByInput() {
 
 void SelectSongMenu::SelectingLevelByInput() {
 
-
 	if (levelSelect) {
 
 		// 難易度選択中なら難易度のインデックスを減らす
@@ -250,8 +201,8 @@ void SelectSongMenu::SelectingLevelByInput() {
 	}
 }
 
-
-void SelectSongMenu::StartPlaySongByInput() {
+// ----------------------------------------------------------------------------------------------------
+void SelectSongMenu::SetDimScreenAtFinalCheck() {
 
 	if (show_finalCheck_before_startPlaySong) {
 
@@ -279,6 +230,43 @@ void SelectSongMenu::StartPlaySongByInput() {
 }
 
 
+void SelectSongMenu::SongGenreTotalCount() {
+
+	// 追加済みプレイリスト
+	for (int i = 0; i < PLAYLIST_NUM; i++)
+	{
+		// 全曲ジャンル
+		for (int j = 0; j < GENRE_NUM; j++)
+		{
+			// ジャンル名が一致したらカウントを増やす
+			if (strcmp(_songGenre[i], _songGenreRefAll[j]) == 0)
+			{
+				genreCount[j]++;
+				break; // 一致したらループを抜ける
+			}
+		}
+	}
+}
+
+// 描画----------------------------------------------------------------------------------------------------
+void SelectSongMenu::RenderTotalSongGenreList() {
+
+	// ジャンルと曲数を表示  左側縦方向
+	for (int i = 0; i < GENRE_NUM; i++)
+	{
+		// 選択中の曲のジャンルなら色を変える
+		if (strcmp(_songGenre[songIndex], _songGenreRefAll[i]) == 0)
+		{
+			SetDrawBright(0, 255, 0); // 色を緑にする
+		}
+
+		// ジャンルと曲数を表示する
+		DrawFormatString(50, 20 + i * 33, -1, "%s：%d", _songGenreRefAll[i], genreCount[i]);
+		SetDrawBright(255, 255, 255); // 色を白に戻す
+	}
+}
+
+
 void SelectSongMenu::RenderAndChangeColor_SongTitle() {
 
 	for (int i = 0; i < PLAYLIST_NUM; i++)
@@ -286,8 +274,7 @@ void SelectSongMenu::RenderAndChangeColor_SongTitle() {
 		// 選択中の曲なら色を変える
 		if (songSelect && i == songIndex)
 		{
-			SetDrawBright(255, 255, 0); // 色を黄色にする
-
+			SetDrawBright(255, 255, 0);   // 色を黄色にする
 		}
 		else {
 			SetDrawBright(255, 255, 255); // 色を白に戻す
@@ -314,19 +301,18 @@ void SelectSongMenu::RenderAndChangeColor_SongLevel() {
 
 		// 難易度を表示する
 		DrawOvalAA(
-			static_cast<float>(_LEVELSHAPES_X_POS + ((i + 1) * 100)), 
+			static_cast<float>(_LEVELSHAPES_X_POS + ((i + 1) * 100)),
 			_LEVELLIST_Y_POS,
 			50, 50, 8, -1,
-			false, 
+			false,
 			1
 		);
 
 		SetFontSize(15);
-
 		DrawString(
 			_LEVELLIST_X_POS + ((i + 1) * 100),
 			_LEVELLIST_Y_POS,
-			 _songLevels[i],
+			_songLevels[i],
 			-1
 		);
 	}
@@ -336,8 +322,7 @@ void SelectSongMenu::RenderAndChangeColor_SongLevel() {
 void SelectSongMenu::RenderBigSizeTitle_AtCenter() {
 
 	SetDrawBright(255, 255, 255);
-	//難易度上に選択中の曲のタイトル（大）
-	SetFontSize(80);
+	SetFontSize(80);	          //難易度上に選択中の曲のタイトル（大）
 	DrawFormatString(_BIGSIZE_TITLE_POS_X, _BIGSIZE_TITLE_POS_Y, -1, _songTitle[songIndex]);
 
 	SetFontSize(40);
@@ -351,17 +336,9 @@ void SelectSongMenu::Render() {
 	// プレイシーンにまだ飛んでいなければ描画
 	if (moveToPlayScene) return;
 
-	Render_TotalSongGenreList();
+	SetDimScreenAtFinalCheck();       // 明るさ調整
 
-	SelectingSongByInput();
-
-	PickOneSongByInput();
-
-	BackToPreviousByInput();
-
-	SelectingLevelByInput();
-
-	StartPlaySongByInput();
+	RenderTotalSongGenreList();
 
 	RenderAndChangeColor_SongTitle();
 
@@ -371,15 +348,34 @@ void SelectSongMenu::Render() {
 }
 
 
+// 更新----------------------------------------------------------------------------------------------------
+void SelectSongMenu::MoveToScenePlaySong()
+{
+	auto mgr = SceneManager::GetInstance();
+	mgr->SceneChange(new PlaySong(
+		_songTitle[songIndex],     //選択曲
+		_songLevels[levelIndex],  //選択難易度、
+		songIndex, levelIndex)); // 選んだ曲の番号 を PlaySongシーンに渡す
+}
+
+
 void SelectSongMenu::Update(float deltaTime) {
 
 	sequence.update(deltaTime);
+
+	SelectingSongByInput();
+
+	PickOneSongByInput();
+
+	BackToPreviousByInput();
+
+	SelectingLevelByInput();
 
 	if (moveToPlayScene) {
 
 		StopSoundMem(songList[songIndex]);
 		SetCurrentPositionSoundMem(0, songList[songIndex]);
-		songSelect = true;
+		songSelect = true;  // また曲選択に戻ってきたときに曲選択から始められるように
 	}
 }
 

@@ -35,7 +35,7 @@ private:
 	tnl::Sequence<PlaySong> sequence = tnl::Sequence<PlaySong>(this, &PlaySong::SeqIdle);
 	bool SeqIdle(float delta_time);
 
-	void ResetGame();
+	void RevertAllChanges();
 
 	// ゲッター----------------------------------------------------------
 	float GetDeltaTime() const { return deltaTime_ref; }
@@ -52,8 +52,6 @@ private:
 	void PlaySongUntilSongEnd();      // 曲終了まで曲を流す
 
 	// 描画------------------------------------------------------------
-	void RenderScore();
-	void RenderCombo();
 	void RenderMetaData(); // 選択曲、選択難易度
 
 public:
@@ -62,21 +60,22 @@ public:
 
 private:
 
-	Notes* _normal_downcastRef = nullptr;
-	Notes* _long_downcastRef = nullptr;
-	NormalNote* _normal_noteRef = nullptr;
-	LongNote* _long_noteRef = nullptr;
+	Notes*       _normal_downcastRef = nullptr;
+	Notes*       _long_downcastRef = nullptr;
+	NormalNote*  _normal_noteRef = nullptr;
+	LongNote*    _long_noteRef = nullptr;
 
-	ScoreCombo* _scoreCombo = nullptr;
+	ScoreCombo*  _scoreCombo = nullptr;
 	PauseOption* _pauseOption = nullptr;
 
 public:
 
-	static int currentState;                 // メニュー画面のステート状態
-	static int songIndex;                    // 曲番号
-	static constexpr int COVERALBUM_NUM = 4; // カバーアルバム数
-	static bool isPaused;
-	static bool moveToResult;
+	static constexpr int COVERALBUM_NUM = 4;           // カバーアルバム数
+	static int           currentState;                 // メニュー画面のステート状態
+	static int           songIndex;                    // 曲番号
+	static bool          isPaused;
+	static bool          moveToResult;
+	static bool          isRetryGame;
 
 private:
 
@@ -90,7 +89,7 @@ private:
 	float elapsed{};                            // 経過時間
 	float progress_ratio{};                     // フェードの変化率
 	float brightnessAlpha{};                    // 明度
-	float deltaTime_ref{};                     // 引数からdeltaTimeを取得できないケースで使用する
+	float deltaTime_ref{};                      // 引数からdeltaTimeを取得できないケースで使用する
 	float duration = 4.0f;                      // 曲情報表示時間
 
 	double spawnNotesDuration{};                // ノーツの１拍あたりの生成間隔	

@@ -19,7 +19,7 @@ public:
 
 	// ï`âÊ------------------------------------------------------------------------------------------
 	void RenderLowMediumHighWord(int& eff1_color, int& eff2_color, int& eff3_color);
-	void RenderAdjustVolumeFunc();
+	void RenderAdjustVolumeObject();
 	void RenderMenuItems_AndDescriptions();
 
 	// çXêV------------------------------------------------------------------------------------------
@@ -29,7 +29,6 @@ public:
 
 public:
 
-	static bool isRetryGame;
 	bool showOption{};    
 	bool selectEffectColor{};
 	int effectIndex = 2;

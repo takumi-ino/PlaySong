@@ -13,11 +13,11 @@ void NoteDataCsv::SetNoteKeyValue() {
 
 std::string NoteDataCsv::GetNoteCsvMapKey(const std::string& key) {
 
-	if (!_key_value.count(key) > 0) return "ERROR";
+	if (!_key_value.count(key) > 0)
+		return "ERROR";
 
 	return _key_value[key];
 }
-
 
 
 std::vector<std::vector<tnl::CsvCell>>& NoteDataCsv::LoadNoteCsv(const std::string& key) {
@@ -26,7 +26,8 @@ std::vector<std::vector<tnl::CsvCell>>& NoteDataCsv::LoadNoteCsv(const std::stri
 
 		std::string value = GetNoteCsvMapKey(key);
 
-		if (value == "ERROR") 	throw "Please check Key again";
+		if (value == "ERROR") 
+			throw "Please check Key again";
 
 		_csvFile = tnl::LoadCsv(value.c_str());
 	}

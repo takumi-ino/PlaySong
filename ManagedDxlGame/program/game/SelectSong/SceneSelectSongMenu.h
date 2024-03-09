@@ -26,15 +26,18 @@ private:
 	// 入力--------------------------------------------------------------------------------
 	void SelectingSongByInput();            // 曲選択
 	void PickOneSongByInput();              // 曲決定
+	void MoveToScenePlaySong();
 	void BackToPreviousByInput();           // 1つ前に戻る
 	void SelectingLevelByInput();           // 難易度選択
-	void StartPlaySongByInput();	        // ゲーム開始
 
 	// 描画--------------------------------------------------------------------------------
-	void Render_TotalSongGenreList();	    // 画面左上
+	void RenderTotalSongGenreList();	    // 画面左上
 	void RenderAndChangeColor_SongTitle();	// 曲タイトル色変更
 	void RenderAndChangeColor_SongLevel();	// 曲レベル色変更
 	void RenderBigSizeTitle_AtCenter();	    // 中央に表示の曲タイトル
+
+	// 明るさ調整--------------------------------------------------------------------------
+	void SetDimScreenAtFinalCheck();	    // ゲーム開始前の最終確認で
 	
 public:
 
@@ -56,13 +59,13 @@ private:
 	int songTitleXPos_leftSide = 360;
 	int	songTitleYPos_leftSide = 280;
 
-	int songIndex = 0; // 選択中の曲のインデックス
-	int levelIndex = 0; // 選択中の難易度のインデックス
+	int songIndex = 0;             // 選択中の曲のインデックス
+	int levelIndex = 0;            // 選択中の難易度のインデックス
 	int dimScreen_alphaSize = 50;
 	int notesAllNum{};
 
-	bool songSelect = true;   // 曲選択中かどうか
-	bool levelSelect = false; // 難易度選択中かどうか
+	bool songSelect = true;        // 曲選択中かどうか
+	bool levelSelect = false;      // 難易度選択中かどうか
 	bool backToTitle = false;
 	bool show_finalCheck_before_startPlaySong = false;
 	bool moveToPlayScene = false;
