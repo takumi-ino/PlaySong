@@ -1,6 +1,6 @@
 #pragma once
 #include "../Notes.h"
-#include "../../../../dxlib_ext/dxlib_ext.h"
+
 
 class LongNote : public Notes
 {
@@ -20,15 +20,15 @@ public:
 Å@Å@*/
 
 	LongNote(
-		float x1_long_start, float x1_long_end, 
-		float y1_long, 
+		float _longStart_x1, float _longEnd_x1, 
+		float _long_y1, 
 		float x_vel_long, float y_vel_long,
-		float size_long, int color_long, bool active_long
+		float _long_size, int color_long, bool active_long
 	) :Notes(
-		x1_long_start, x1_long_end,
-		y1_long, 
+		_longStart_x1, _longEnd_x1,
+		_long_y1, 
 		x_vel_long, y_vel_long,
-		size_long, 
+		_long_size, 
 		color_long,
 		active_long
 	) {}
@@ -36,6 +36,10 @@ public:
 	void UpdateNotes(const double& timer, const float& deltaTime) override;
 
 private:
+
+	 /*
+	     DRYå¥ë•Ç…ÇÊÇËéóÇΩèàóùÇÕÇ‹Ç∆ÇﬂÇƒèàóù
+     */
 
 	void UpdateLongNotes_DRY(
 		std::vector<LongNote>& longNote,
@@ -58,5 +62,5 @@ public:
 
 private:
 
-	float long_start_end_distanceRatio = 1.5f;
+	float _long_startAndend_distanceRatio = 1.5f;
 };

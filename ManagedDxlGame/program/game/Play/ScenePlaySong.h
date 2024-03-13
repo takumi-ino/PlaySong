@@ -1,6 +1,4 @@
 #pragma once
-#include "../library/tnl_sequence.h"
-#include "../Manager/SceneManager.h"
 #include "../Manager/Scene/SceneBase.h"
 
 
@@ -18,12 +16,12 @@ class Timer;
 extern JudgeZone judgeZone[4];
 
 
-class PlaySong : public Scenes 
+class PlaySong : public Scenes
 {
 public:
 
 	PlaySong() {}
-	PlaySong(const char* title, const char* level, const int songIndex, const int levelIdx);
+	PlaySong(const char* title, const char* level, const int _songIndex, const int levelIdx);
 
 	void Destroy() override;
 
@@ -32,13 +30,12 @@ public:
 
 private:
 
+	// 講師配布ライブラリより。Sequenceクラスの タイマー関数を使用する
 	tnl::Sequence<PlaySong> sequence = tnl::Sequence<PlaySong>(this, &PlaySong::SeqIdle);
-	bool SeqIdle(float delta_time);
-
-	void RevertAllChanges();
-
+	bool SeqIdle(float delta_time) { return true; };
+			
 	// ゲッター----------------------------------------------------------
-	float GetDeltaTime() const { return deltaTime_ref; }
+	float GetDeltaTime() const { return _deltaTime; }
 
 	// ロード----------------------------------------------------------
 	void LoadImages();
@@ -50,6 +47,11 @@ private:
 	void ShowSongInfo_BeforeStart();  // プレイ開始前に曲名を表示
 	void CheckIfSongEndByTimer();     // 曲終了まで時間計測
 	void PlaySongUntilSongEnd();      // 曲終了まで曲を流す
+	void BackToSelectSongMenu();      // 曲選択へ戻る
+	void RetryGame();                 // ゲームをやり直す
+	void MoveToResult();              // リザルトへ飛ぶ
+	void ActivatePauseMenu();         // ポーズメニューを開く
+	void RevertAllChanges();          // プレイシーンから離れるときに全ての変更をリセットする
 
 	// 描画------------------------------------------------------------
 	void RenderMetaData(); // 選択曲、選択難易度
@@ -70,31 +72,25 @@ private:
 
 public:
 
-	static constexpr int COVERALBUM_NUM = 4;           // カバーアルバム数
-	static int           currentState;                 // メニュー画面のステート状態
-	static int           songIndex;                    // 曲番号
-	static bool          isPaused;
-	static bool          moveToSongSelect;
-	static bool          moveToResult;
-	static bool          isRetryGame;
+	static constexpr int _COVERALBUM_NUM = 4; // カバーアルバム数
+	static int           _currentState;       // メニュー画面のステート状態
+	static int           _songIndex;          // 曲番号
+	static bool          _isPaused;
+	static bool          _moveToSongSelect;
+	static bool          _moveToResult;
+	static bool          _isRetryGame;
 
 private:
 
-	int songBpm{};
-	int songNotesNum{};
-	int levelIndex{};
+	int   _songBpm{};              // BPM
+	int   _levelIndex{};
 
-	float songDuration{};                       // 曲の長さ
-	float timeCount_start = 0.f;
+	float _songDuration{};         // 曲の長さ
+	float _elapsed{};              // 経過時間
+	float _progress_ratio{};       // フェードの変化率
+	float brightnessAlpha{};      // 明度
+	float _deltaTime{};            // 引数からdeltaTimeを取得できないケースで使用する
 
-	float elapsed{};                            // 経過時間
-	float progress_ratio{};                     // フェードの変化率
-	float brightnessAlpha{};                    // 明度
-	float deltaTime_ref{};                      // 引数からdeltaTimeを取得できないケースで使用する
-	float duration = 4.0f;                      // 曲情報表示時間
-
-	double spawnNotesDuration{};                // ノーツの１拍あたりの生成間隔	
-
-	bool showInfo_beforeStart_playSong = true;
-	bool isFadeIn = false;
+	bool  _isFadeIn = false;                //  曲タイトル表示演出
+	bool  _showInfo_beforeStartGame = true; //  曲タイトル表示演出
 };

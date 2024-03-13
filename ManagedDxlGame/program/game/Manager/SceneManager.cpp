@@ -4,7 +4,7 @@
 
 
 SceneManager::SceneManager(Scenes* scene) :_nowScene(scene) {
-	_transGraph_hdl = LoadGraph("graphics/black.bmp");     // フェードイン、フェードアウト用画像
+	_transGraph_hdl = LoadGraph("graphics/black.bmp");
 }
 
 
@@ -30,7 +30,6 @@ void SceneManager::SceneChange(Scenes* NEXT, float TIME) {
 }
 
 
-
 void SceneManager::Update(float deltaTime) {
 
 	if (_nowScene) 
@@ -45,9 +44,9 @@ void SceneManager::Update(float deltaTime) {
 
 bool SceneManager::SeqFadeOut(const float deltaTime) {  // フェードアウト
 
-	int brightnessAlpha = (sequence_.getProgressTime() / _transTime * 255.0f);
+	float brightAlpha = (sequence_.getProgressTime() / _transTime * 255.0f);
 	
-	if (brightnessAlpha >= 255) {
+	if (brightAlpha >= 255.f) {
 
 		sequence_.change(&SceneManager::SeqFadeIn);
 		_nowScene->Destroy();
@@ -56,7 +55,7 @@ bool SceneManager::SeqFadeOut(const float deltaTime) {  // フェードアウト
 		_nowScene = _nextScene;
 	}
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, brightnessAlpha);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(brightAlpha));
 	DrawExtendGraph(0, 0, DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT, _transGraph_hdl, true);
 	SetDrawBlendMode(DX_GRAPH_BLEND_NORMAL, 255);
 
@@ -66,12 +65,12 @@ bool SceneManager::SeqFadeOut(const float deltaTime) {  // フェードアウト
 
 bool SceneManager::SeqFadeIn(const float deltaTime) {       // フェードイン
 
-	int brightnessAlpha = 255 - (sequence_.getProgressTime() / _transTime * 255.0f);
+	float brightAlpha = 255.f - (sequence_.getProgressTime() / _transTime * 255.0f);
 
-	if (brightnessAlpha <= 0)
+	if (brightAlpha <= 0.f)
 		sequence_.change(&SceneManager::SeqRun);
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, brightnessAlpha);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(brightAlpha));
 	DrawExtendGraph(0, 0, DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT, _transGraph_hdl, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 

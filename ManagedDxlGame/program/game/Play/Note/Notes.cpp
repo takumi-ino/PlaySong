@@ -1,6 +1,5 @@
-#include "../Timer/Timer.h"
-#include "LoadCSV/NoteDataCsv.h"
 #include "Notes.h"
+#include "LoadCSV/NoteDataCsv.h"
 
 
 Notes::Notes(const std::string& csv_key) {
@@ -9,83 +8,83 @@ Notes::Notes(const std::string& csv_key) {
 
 	for (int i = 0; i < csv.size(); ++i) {                   // CSV縦列
 
-		justSpawnTime_ms.emplace_back(csv[i][0].getFloat()); // floatに変換
-		lane.emplace_back(csv[i][1].getInt());               // Intに変換
-		NoteType.emplace_back(csv[i][2].getString());        // std::stringに変換
+		_justSpawnNoteTime_ms.emplace_back(csv[i][0].getFloat()); // floatに変換
+		_lane.emplace_back(csv[i][1].getInt());               // Intに変換
+		_noteType.emplace_back(csv[i][2].getString());        // std::stringに変換
 
 		// 生成位置から判定エリアまでの移動時間差分を差し引く
-		justSpawnTime_ms[i] -= static_cast<float>(moveToJudgeZoneSecond);
+		_justSpawnNoteTime_ms[i] -= static_cast<float>(_reachToJudgeZone_perfectSecond);
 
-		switch (lane[i]) // レーンが一致する各配列に末尾から要素を追加
+		switch (_lane[i]) // レーンが一致する各配列に末尾から要素を追加
 		{
 
 		case 0:
 
-			if (NoteType[i] == "NORMAL") {
+			if (_noteType[i] == "NORMAL") {
 
 				_normal_note_row_num_lane0_base++;
-				_normalSpawnTime_lane0_base.emplace_back(justSpawnTime_ms[i]);
+				_normalSpawnTime_lane0_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
-			else if (NoteType[i] == "LONG_START") {
+			else if (_noteType[i] == "LONG_START") {
 
 				_long_note_row_num_lane0_base++;
-				_longStartTime_lane0_base.emplace_back(justSpawnTime_ms[i]);
+				_longStartTime_lane0_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
-			else if (NoteType[i] == "LONG_END") {
+			else if (_noteType[i] == "LONG_END") {
 
-				_longEndTime_lane0_base.emplace_back(justSpawnTime_ms[i]);
+				_longEndTime_lane0_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
 			break;
 		case 1:
 
-			if (NoteType[i] == "NORMAL") {
+			if (_noteType[i] == "NORMAL") {
 
 				_normal_note_row_num_lane1_base++;
-				_normalSpawnTime_lane1_base.emplace_back(justSpawnTime_ms[i]);
+				_normalSpawnTime_lane1_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
-			else if (NoteType[i] == "LONG_START") {
+			else if (_noteType[i] == "LONG_START") {
 
 				_long_note_row_num_lane1_base++;
-				_longStartTime_lane1_base.emplace_back(justSpawnTime_ms[i]);
+				_longStartTime_lane1_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
-			else if (NoteType[i] == "LONG_END") {
+			else if (_noteType[i] == "LONG_END") {
 
-				_longEndTime_lane1_base.emplace_back(justSpawnTime_ms[i]);
+				_longEndTime_lane1_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
 			break;
 		case 2:
 
-			if (NoteType[i] == "NORMAL") {
+			if (_noteType[i] == "NORMAL") {
 
 				_normal_note_row_num_lane2_base++;
-				_normalSpawnTime_lane2_base.emplace_back(justSpawnTime_ms[i]);
+				_normalSpawnTime_lane2_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
-			else if (NoteType[i] == "LONG_START") {
+			else if (_noteType[i] == "LONG_START") {
 
 				_long_note_row_num_lane2_base++;
-				_longStartTime_lane2_base.emplace_back(justSpawnTime_ms[i]);
+				_longStartTime_lane2_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
-			else if (NoteType[i] == "LONG_END") {
+			else if (_noteType[i] == "LONG_END") {
 
-				_longEndTime_lane2_base.emplace_back(justSpawnTime_ms[i]);
+				_longEndTime_lane2_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
 			break;
 		case 3:
 
-			if (NoteType[i] == "NORMAL") {
+			if (_noteType[i] == "NORMAL") {
 
 				_normal_note_row_num_lane3_base++;
-				_normalSpawnTime_lane3_base.emplace_back(justSpawnTime_ms[i]);
+				_normalSpawnTime_lane3_base.emplace_back(_justSpawnNoteTime_ms[i]);
 
 			}
-			else if (NoteType[i] == "LONG_START") {
+			else if (_noteType[i] == "LONG_START") {
 
 				_long_note_row_num_lane3_base++;
-				_longStartTime_lane3_base.emplace_back(justSpawnTime_ms[i]);
+				_longStartTime_lane3_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
-			else if (NoteType[i] == "LONG_END") {
+			else if (_noteType[i] == "LONG_END") {
 
-				_longEndTime_lane3_base.emplace_back(justSpawnTime_ms[i]);
+				_longEndTime_lane3_base.emplace_back(_justSpawnNoteTime_ms[i]);
 			}
 			break;
 		}
@@ -93,26 +92,26 @@ Notes::Notes(const std::string& csv_key) {
 }
 
 
-Notes::Notes(float x1, float y1, float x_vel, float y_vel, float size, int color, bool isActive) {
+Notes::Notes(float _x1, float _y1, float _velocity_x, float _velocity_y, float size, int _color, bool _isActive) {
 
-	this->x1 = x1;
-	this->y1 = y1;
-	this->x_vel = x_vel;
-	this->y_vel = y_vel;
-	this->size = size;
-	this->color = color;
-	this->isActive = isActive;
+	this->_x1 = _x1;
+	this->_y1 = _y1;
+	this->_velocity_x = _velocity_x;
+	this->_velocity_y = _velocity_y;
+	this->_size = size;
+	this->_color = _color;
+	this->_isActive = _isActive;
 }
 
 
-Notes::Notes(float x1_long_start, float x1_long_end, float y1_long, float x_vel, float y_vel, float size_long, int color, bool isActive) {
+Notes::Notes(float _longStart_x1, float _longEnd_x1, float _long_y1, float _velocity_x, float _velocity_y, float _long_size, int _color, bool _isActive) {
 
-	this->x1_long_start = x1_long_start;
-	this->x1_long_end = x1_long_end;
-	this->y1_long = y1_long;
-	this->x_vel = x_vel;
-	this->y_vel = y_vel;
-	this->size_long = size_long;
-	this->color = color;
-	this->isActive = isActive;
+	this->_longStart_x1 = _longStart_x1;
+	this->_longEnd_x1 = _longEnd_x1;
+	this->_long_y1 = _long_y1;
+	this->_velocity_x = _velocity_x;
+	this->_velocity_y = _velocity_y;
+	this->_long_size = _long_size;
+	this->_color = _color;
+	this->_isActive = _isActive;
 }

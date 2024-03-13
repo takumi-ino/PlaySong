@@ -1,6 +1,5 @@
 #pragma once
 #include "../../utility/DxLib_Engine.h"
-#include "../../utility/tnlSequence.h"
 
 
 class Notes {
@@ -11,47 +10,49 @@ public:
 	Notes(const std::string& csv_key);
 
 	Notes(
-		float x1,
-		float y1,
-		float x_vel,
-		float y_vel,
+		float _x1,
+		float _y1,
+		float _velocity_x,
+		float _velocity_y,
 		float size,
-		int color,
-		bool isActive
+		int _color,
+		bool _isActive
 	);
 
 	Notes(
-		float x1_long_start,
-		float x1_long_end,
-		float y1_long,
-		float x_vel,
-		float y_vel,
-		float size_long,
-		int color,
-		bool isActive
+		float _longStart_x1,
+		float _longEnd_x1,
+		float _long_y1,
+		float _velocity_x,
+		float _velocity_y,
+		float _long_size,
+		int _color,
+		bool _isActive
 	);
 
-	virtual void UpdateNotes(const double& timer, const float& deltaTime) {}
+	virtual void UpdateNotes(
+		const double& timer, const float& deltaTime) 
+	{}
 
 public:
 
-	bool  isActive{};
+	bool  _isActive{};
 
 protected:
 
 	// 初期化用定数------------------------------------------------------------
-	const int   NOTE_COL_NUM = 4;
-	const int   noteSpace = 50;
-	const float   STARTPOS_X1 = 565.f;     // ノーツ[0] 左上X
-	const float   STARTPOS_Y1 = 100.f;     // ノーツ[0] 左上Y
-	const float STARTPOS_X2 = 0.1f;    // ノーツ[0] 右下X
-	const float STARTPOS_Y2 = 0.01f;   // ノーツ[0] 右下Y
+	const int   _NOTE_COL_NUM = 4;
+	const int   _NOTE_SPACE = 50;
+	const float _STARTPOS_X1 = 565.f;   // ノーツ[0] 左上X
+	const float _STARTPOS_Y1 = 100.f;   // ノーツ[0] 左上Y
+	const float _STARTPOS_X2 = 0.1f;    // ノーツ[0] 右下X
+	const float _STARTPOS_Y2 = 0.01f;   // ノーツ[0] 右下Y
 
 	// ロングノーツ------------------------------------------------------------
-	float x1_long_start{};
-	float x1_long_end{};
-	float y1_long{};
-	float size_long = 2.0f; // 線の長さ (ロングノーツの終了位置で使用）
+	float _longStart_x1{};
+	float _longEnd_x1{};
+	float _long_y1{};
+	float _long_size = 2.0f; // 線の長さ (ロングノーツの終了位置で使用）
 
 	std::vector<double> _longStartTime_lane0_base{};
 	std::vector<double> _longStartTime_lane1_base{};
@@ -80,26 +81,27 @@ protected:
 	int         _normal_note_row_num_lane3_base{};
 
 	// ノーマル・ロング共通----------------------------------------
-	int   color{};
+	int   _color{};
 
-	float x1{};
-	float y1{};
-	float x_vel{};   // 横方向に動く速度
-	float y_vel{};   // 縦方向に動く速度
-	float size{};	 // サイズ
-	float speed{};   // スピード
+	float _x1{};
+	float _y1{};
+	float _velocity_x{};   // 横方向に動く速度
+	float _velocity_y{};   // 縦方向に動く速度
+	float _size{};   	   // サイズ
 
-	std::vector<std::string> NoteType{};      // ノーツタイプ
-	std::vector<int>         lane{};          // 生成位置（レーン）
+	std::vector<std::string> _noteType{};      // ノーツタイプ
+	std::vector<int>         _lane{};          // 生成位置（レーン）
 
 private:
 
 	// 1秒間に何ピクセル移動するか
-	double moveSpeed_pixel = 600.0;
+	double _moveSpeed_perPixel = 600.0;
 	// 生成位置から判定位置までの距離 （NotesクラスとJudgeZoneクラス参照
-	double moveDistance = 500.0;
-	//判定エリアに到達する時刻よりも早く出現させなくてはならないため時間を引く
-	double moveToJudgeZoneSecond = moveDistance / moveSpeed_pixel;
+	double _noteMoveWayDistance = 500.0;
 
-	std::vector<float>       justSpawnTime_ms{};  // 生成タイミング
+	// 判定エリアに到達するまでの時間
+	//判定エリアに到達する時刻よりも早く出現させなくてはならないため、時間を引く
+	double _reachToJudgeZone_perfectSecond = _noteMoveWayDistance / _moveSpeed_perPixel;
+
+	std::vector<float> _justSpawnNoteTime_ms{};  // 生成タイミング
 };

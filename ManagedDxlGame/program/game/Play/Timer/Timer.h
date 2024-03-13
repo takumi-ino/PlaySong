@@ -1,31 +1,28 @@
 #pragma once
 #include <chrono>
-#include "../Pause/PauseOption.h"
 
 
 class Timer {
 public:
 
-	Timer() : isPaused(false) {}
+	Timer() : _isPaused(false) {}
 
-	void Start();
+	void Start();      // 開始
 
-	void Pause();
+	void Pause();      // 一時停止
 
-	void Resume();
+	void Resume();     // 再開
 
-	void Reset();
+	void Reset();      // リセット
 
-	double Elapsed();
+	double Elapsed();  // 経過
 
 public:
 
-	bool isPaused{};
+	bool   _isPaused{};
 
-	double currentTime{}; // タイマー
-	double deltaTime{};
+	double _currentTime{};
 
-	std::chrono::high_resolution_clock::time_point start_time;
-	std::chrono::high_resolution_clock::time_point paused_time;
-	std::chrono::high_resolution_clock::time_point lastFrameTime;
+	std::chrono::high_resolution_clock::time_point _startTime;
+	std::chrono::high_resolution_clock::time_point _pausedTime;
 };

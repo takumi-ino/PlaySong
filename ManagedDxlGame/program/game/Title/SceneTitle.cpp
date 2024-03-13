@@ -2,7 +2,6 @@
 #include "../SelectSong/SceneSelectSongMenu.h"
 #include "../Play/ScenePlaySong.h"
 #include "../Result/SceneResult.h"
-#include "../Main.h"
 
 
 namespace {
@@ -15,24 +14,15 @@ namespace {
 }
 
 
-void Title::Update(float deltaTime) {
+Title::Title() {
 
-	sequence.update(deltaTime);
-
-	// 背景色セット
-	if (fadeIO) {
-
-		int brightnessAlpha = static_cast<int>((sequence.getProgressTime() / 1.0f * 255.0f));
-
-		if (brightnessAlpha >= _maxAlphaSize)  
-			brightnessAlpha = _maxAlphaSize;
-
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, brightnessAlpha);
-		DrawExtendGraph(0, 0, DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT, whiteImg, true);
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-	}
+	SoundManager::GetInstance()->LoadPlayListSongs();
+}
 
 
+void Title::ApplyFlushEffectOnText()
+{
+	// アルファ値を変更
 	brightnessAlpha = (brightnessAlpha < 360.0f) ? brightnessAlpha += 0.1f : brightnessAlpha = 0.0f;
 
 	float flash = sin(brightnessAlpha) * 120.f;
@@ -44,30 +34,28 @@ void Title::Update(float deltaTime) {
 }
 
 
-bool Title::SeqIdle(float deltaTime) {
-
-	if (sequence.isStart()) {
-
-		fadeIO = true;
-		whiteImg = LoadGraph("graphics/white.bmp");
-	}
-
+void Title::MoveToSelectSongMenu()
+{
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN) || tnl::Input::IsPadDownTrigger(ePad::KEY_1)) {
 
-		if (!soundPlayed) {
+		if (!_soundPlayed) {
 
 			PlaySoundMem(titleToSelectMenu_hdl, DX_PLAYTYPE_BACK, TRUE);
-			soundPlayed = true;
+			_soundPlayed = true;
 		}
 
 		auto mgr = SceneManager::GetInstance();
 		mgr->SceneChange(new SelectSongMenu());
-		moveToSongSelect = true;
+		_moveToSongSelect = true;
 	}
+}
 
-	if (moveToSongSelect) {
 
-		soundPlayed = false;
+void Title::StopTitleBGM()
+{
+	if (_moveToSongSelect) {
+
+		_soundPlayed = false;
 		StopSoundMem(title_BGM_hdl);
 		SetCurrentPositionSoundMem(0, title_BGM_hdl);
 	}
@@ -75,6 +63,14 @@ bool Title::SeqIdle(float deltaTime) {
 
 		PlaySoundMem(title_BGM_hdl, DX_PLAYTYPE_LOOP, FALSE);
 	}
+}
 
-	return true;
+
+void Title::Update(float deltaTime) {
+
+	ApplyFlushEffectOnText();
+
+	MoveToSelectSongMenu();
+
+	StopTitleBGM();
 }

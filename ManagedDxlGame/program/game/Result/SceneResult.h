@@ -1,5 +1,4 @@
 #pragma once
-#include "../library/tnl_sequence.h"
 #include "../Manager/Scene/SceneBase.h"
 
 
@@ -20,53 +19,44 @@ public:
 		const char* songLevel
 	);
 
-	const char* GetRank(int resultScore) ;
-
 	void Render() override;
 	void Update(float deltaTime) override;
 
 private:
 
-	void LoadMyPastHighScore();
+	const char* GetRank(int resultScore);  // スコアに応じたランクを返す
 
-	void CheckIfNeed_OverwriteHighScore();
+	void LoadMyPastHighScore();            // 過去のハイスコアをロード
 
-	void DrawResult(
+	void CheckIfNeed_OverwriteHighScore(); // ハイスコアを必要に応じて更新
+
+	void DrawResult(                       // 各種テキストに応じて描画
 		const float x, 
 		const float y,
 		const int fontSize, 
-		const std::string& text,
-		const std::string& value = ""
+		const std::string text,
+		const int value = -1
     );
-
-	tnl::Sequence<Result> sequence = tnl::Sequence<Result>(this, &Result::SeqIdle);
-	bool SeqIdle(float deltaTime);
 
 private:
 
-	int _highScoreInt{};
+	// 総合スコア----------------------------------------
+	int         _score{};
+	int         _highScore{};
+	int         _maxCombo{};
 
-	int _scoreInt{};
-	int _PerfectInt{};
-	int _GreatInt{};
-	int _GoodInt{};
-	int _PoorInt{};
-	int _MissInt{};
+	// 各種スコア----------------------------------------
+	int         _perfect{};
+	int         _great{};
+	int         _good{};
+	int         _poor{};
+	int         _miss{};
 
-	int _maxComboInt{};
+	// ----------------------------------------
+	char*       _songName{};    // 曲名
+	char*       _songLevel{};   // 難易度
+	const char* _rank{};        // ランク
 
-	char* _songName{};
-	char* _songLevel{};
-	const char* _rank{};
-
-	std::string _score{};
-	std::string _highScore{};
-	std::string _maxCombo{};
-	std::string _Perfect{};
-	std::string _Great{};
-	std::string _Good{};
-	std::string _Poor{};
-	std::string _Miss{};
-
-	bool isResultScene = true;
+	// ----------------------------------------
+	bool        _isResultScene = true;
 };

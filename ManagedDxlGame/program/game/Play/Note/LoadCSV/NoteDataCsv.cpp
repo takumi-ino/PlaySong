@@ -1,22 +1,23 @@
+#include "../../../utility/DxLib_Engine.h"
 #include "NoteDataCsv.h"
 #include <stdexcept>
 
 
-void NoteDataCsv::SetNoteKeyValue() {
+void NoteDataCsv::InitNoteKeyValue() {
 
-	_key_value.insert({ "交響曲第9番", "csv/note_symphonyNo9.csv" });
-	_key_value.insert({ "BadApple!!", "csv/note_badApple.csv" });
-	_key_value.insert({ "裏表ラバーズ", "csv/note_two-facedLovers.csv" });
-	_key_value.insert({ "残酷な天使のテーゼ", "csv/note_cruel_angel's _thesis.csv" });
+	_keyValue.insert({ "交響曲第9番", "csv/note_symphonyNo9.csv" });
+	_keyValue.insert({ "BadApple!!", "csv/note_badApple.csv" });
+	_keyValue.insert({ "裏表ラバーズ", "csv/note_two-facedLovers.csv" });
+	_keyValue.insert({ "残酷な天使のテーゼ", "csv/note_cruel_angel's _thesis.csv" });
 }
 
 
 std::string NoteDataCsv::GetNoteCsvMapKey(const std::string& key) {
 
-	if (!_key_value.count(key) > 0)
+	if (!_keyValue.count(key) > 0)
 		return "ERROR";
 
-	return _key_value[key];
+	return _keyValue[key];
 }
 
 

@@ -1,6 +1,5 @@
 #pragma once
 #include "../Notes.h"
-#include "../../../../dxlib_ext/dxlib_ext.h"
 
 
 class NormalNote : public Notes
@@ -35,6 +34,10 @@ public:
 	void UpdateNotes(const double& timer, const float& deltaTime) override;
 
 private:
+
+	/*
+	    DRYŒ´‘¥‚É‚æ‚è—‚½ˆ—‚Í‚Ü‚Æ‚ß‚Äˆ—
+	*/
 
 	void UpdateNotes_DRY(
 		std::vector<NormalNote>& normalNote,

@@ -1,12 +1,9 @@
 #include "Main.h"
-#include "DxLib.h"
-#include "Play/ScenePlaySong.h"
 #include "../game/Manager/SceneManager.h"
-#include "../game/Title/SceneTitle.h"
-#include "../dxlib_ext/dxlib_ext.h"
-#include "SelectSong/SceneSelectSongMenu.h"
-#include "Result/SceneResult.h"
 #include "Manager/SoundManager.h"
+#include "../dxlib_ext/dxlib_ext.h"
+#include "../game/Title/SceneTitle.h"
+#include "SelectSong/SceneSelectSongMenu.h"
 
 
 SelectSongMenu* _selectSongMenu = nullptr;

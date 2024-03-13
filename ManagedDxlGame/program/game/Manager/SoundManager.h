@@ -1,5 +1,5 @@
 #pragma once
-#include "../../dxlib_ext/dxlib_ext.h"
+
 
 constexpr static int PLAYLIST_NUM = 4; //現在のプレイリスト数
 
@@ -26,10 +26,11 @@ public:
 		return instance;
 	}
 
-	void LoadPlayListSongs();
-	void LoadSE();
-	void LoadBGM();
-	void Destroy();
+	void LoadPlayListSongs();  // プレイリスト一覧ロード
+	void Destroy();            // プレイリスト hdl 解放
+
+	void LoadSE();	           // SEロード
+	void LoadBGM();            // BGMロード
 
 private:
 

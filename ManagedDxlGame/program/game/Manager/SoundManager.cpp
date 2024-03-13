@@ -1,3 +1,4 @@
+#include "../../dxlib_ext/dxlib_ext.h"
 #include "SoundManager.h"
 
 
@@ -9,6 +10,7 @@ int title_BGM_hdl = 0;
 int pause_BGM_hdl = 0;
 int result_BGM_hdl = 0;
 int tap_hdl = 0;
+
 
 
 //  ¦ songList[] ‚ÍScenePlaySong‚Ì coverAlbum_hdl”z—ñ‚Æ‡”Ô‚ğ‡‚í‚¹‚Ä‚­‚¾‚³‚¢

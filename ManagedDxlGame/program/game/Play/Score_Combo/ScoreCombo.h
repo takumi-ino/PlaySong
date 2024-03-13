@@ -1,9 +1,8 @@
 #pragma once
-#include "../../utility/DxLib_Engine.h"
 
 
-class ScoreCombo {
-
+class ScoreCombo 
+{
 public:
 
 	void SetScoreComboRef(ScoreCombo* scRef) { _scoreCombo_ref = scRef; };
@@ -14,20 +13,20 @@ public:
 
 public:
 
-	int myScore{};
-	int myCombo{};
+	int _myScore{};
+	int _myCombo{};
 
-	int perfect_count{};
-	int	great_count{};
-	int	good_count{};
-	int	poor_count{};
-	int	miss_count{};
+	int _perfectCount{};
+	int	_greatCount{};
+	int	_goodCount{};
+	int	_poorCount{};
+	int	_missCount{};
 
-	int comboAnimationFrames = 0;
-	int comboAnimationDuration = 1; // アニメーションの持続フレーム数
+	int _comboAnimationFrames = 0;
+	int _comboAnimationDuration = 1; // アニメーションの持続フレーム数
 
-	int y1_combo = 450;       // コンボ(数値)の座標。一瞬跳ねる演出のため y は非 const
 	const int x1_combo = 590;
+	int _combo_y1 = 450;       // コンボ(数値)の座標。一瞬跳ねる演出のため y は非 const
 
 private:
 
@@ -35,9 +34,6 @@ private:
 
 private:
 
-	int highScore{};
-	int highCombo{};
-
-	std::string score_str{};
-	std::string combo_str{};
+	std::string _scoreString{};
+	std::string _comboString{};
 };

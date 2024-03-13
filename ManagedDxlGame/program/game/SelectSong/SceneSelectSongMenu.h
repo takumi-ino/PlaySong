@@ -1,5 +1,4 @@
 #pragma once
-#include "../library/tnl_sequence.h"
 #include "../Manager/SoundManager.h"
 
 constexpr static int GENRE_NUM = 7; //曲の全ジャンル
@@ -9,8 +8,8 @@ class PlaySong;
 
 
 // 文字列表示、入力処理設定
-class SelectSongMenu : public Scenes {
-
+class SelectSongMenu : public Scenes 
+{
 public:
 
 	void SongGenreTotalCount();
@@ -19,9 +18,6 @@ public:
 	void Update(float deltaTime) override;
 
 private:
-
-	tnl::Sequence<SelectSongMenu> sequence = tnl::Sequence<SelectSongMenu>(this, &SelectSongMenu::SeqIdle);
-	bool SeqIdle(float deltaTime);
 
 	// 入力--------------------------------------------------------------------------------
 	void SelectingSongByInput();            // 曲選択
@@ -38,35 +34,30 @@ private:
 
 	// 明るさ調整--------------------------------------------------------------------------
 	void SetDimScreenAtFinalCheck();	    // ゲーム開始前の最終確認で
-	
+
 public:
 
 	//// 曲のタイトル
-	static const char* _songTitle[PLAYLIST_NUM];
+	static const char* _SONG_TITLE[PLAYLIST_NUM];
 
-	//// 各曲対応のジャンル
-	static const char* _songGenre[PLAYLIST_NUM];
+	//// 収録曲のみに対応したジャンル
+	static const char* _SONG_GENRE[PLAYLIST_NUM];
 
-	//// 本作品で取り扱いたい曲のジャンル一覧
-	static const char* _songGenreRefAll[GENRE_NUM];
+	//// 本作品で取り扱いたい曲の全ジャンル表
+	static const char* _SONG_GENRE_ALL_LIST[GENRE_NUM];
 
 	//// 難易度項目（リテラル）、EasyからAbyssまで
-	static const char* _songLevels[4];
+	static const char* _SONG_LEVELS[4];
 
 private:
 
-	// 左側に選択中の曲名を大きく表示
-	int songTitleXPos_leftSide = 360;
-	int	songTitleYPos_leftSide = 280;
 
-	int songIndex = 0;             // 選択中の曲のインデックス
-	int levelIndex = 0;            // 選択中の難易度のインデックス
-	int dimScreen_alphaSize = 50;
-	int notesAllNum{};
+	int  _songIndex = 0;            // 選択中の曲のインデックス
+	int  _levelIndex = 0;           // 選択中の難易度のインデックス
 
-	bool songSelect = true;        // 曲選択中かどうか
-	bool levelSelect = false;      // 難易度選択中かどうか
-	bool backToTitle = false;
-	bool show_finalCheck_before_startPlaySong = false;
-	bool moveToPlayScene = false;
+	bool _songSelect = true;        // 曲選択中かどうか
+	bool _levelSelect = false;      // 難易度選択中かどうか
+	bool _backToTitle = false;
+	bool _moveToPlayScene = false;
+	bool _showFinalCheck_beforeStartPlaySong = false;
 };

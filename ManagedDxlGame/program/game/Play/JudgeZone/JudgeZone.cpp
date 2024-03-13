@@ -1,12 +1,34 @@
+#include "../../utility/DxLib_Engine.h"
 #include "JudgeZone.h"
-#include "../Score_Combo/ScoreCombo.h"
-#include "../../Main.h"
-#include "../Note/Normal/NormalNote.h"
 #include "../Note/Long/LongNote.h"
+#include "../Note/Normal/NormalNote.h"
+#include "../Score_Combo/ScoreCombo.h"
 #include "../ScenePlaySong.h"
 
 
 namespace {
+
+	// 横線（判定エリア全体範囲）---------------------------------------------------------------------------------------------------------
+	const int _MARGIN_LEFT_AND_RIGHT = 50; // 判定エリアとウィンドウ端との距離
+	const int _AREA_HEIGHT_TOPPOS = 600;
+	const int _AREA_RANGE = 55;
+
+	// 上辺	------------------------------------------------------------
+	const float _judgeZone_x1_ceilingLine = (float)_MARGIN_LEFT_AND_RIGHT;                     //  始点X
+	const float _judgeZone_x2_ceilingLine = (float)DXE_WINDOW_WIDTH - _MARGIN_LEFT_AND_RIGHT;  //  終点X
+	const float _judgeZone_y1_ceilingLine = (float)_AREA_HEIGHT_TOPPOS;                        //  始点Y
+	const float _judgeZone_y2_ceilingLine = 5.f;                                               //  終点Y
+
+	// 下辺------------------------------------------------------------
+	const float _judgeZone_x1_bottomLine = 0.f;                                      //  始点X
+	const float _judgeZone_x2_bottomLine = (float)DXE_WINDOW_WIDTH;                  //  終点X
+	const float _judgeZone_y1_bottomLine = (float)_AREA_HEIGHT_TOPPOS + _AREA_RANGE; //  始点Y
+	const float _judgeZone_y2_bottomLine = 5.f;                                      //  終点Y
+
+	// 縦線（斜め）※５本 判定エリアを４等分に----------------------------------------------------------------------------------------------
+	const float _diagonalLine_x1 = 490.f;                    // 斜め線の始点X
+	const float _diagonalLine_y1 = 100.f;                    // 斜め線の始点Y
+	const float _diagonalLine_y2 = (float)DXE_WINDOW_HEIGHT; // 斜め線の終点Y
 
 	// 各判定エリアの横幅----------------------------------------
 	const int EACHAREA_WIDTH = DXE_WINDOW_WIDTH / JUDGE_NUM;
@@ -25,121 +47,279 @@ static const int KEYS[JUDGE_NUM] =
 	KEY_INPUT_K
 };
 
-
+//　初期化----------------------------------------------------------------------------------------------------
 JudgeZone::JudgeZone() {
 
-	scoreComboRef = new ScoreCombo();
+	_scoreComboRef = new ScoreCombo();
 }
-
 
 
 void JudgeZone::InitJudgeZone() {
 
-	for (column = 0; column < JUDGE_NUM; column++) {
+	for (_column = 0; _column < JUDGE_NUM; _column++) {
 
 		// x軸は20から開始
 		// ｙ軸は上辺600、下辺650で固定
-		switch (column)
+		switch (_column)
 		{
 		case 0:// レーン0
-			judgeZone[column].x1 = judgeZoneX_left_1;
-			judgeZone[column].y1 = judgeZoneY_top_1;
-			judgeZone[column].x2 = judgeZoneX_left_1 + judgeZoneX_right_2 / JUDGE_NUM;
-			judgeZone[column].y2 = judgeZoneY_top_2;
-			judgeZone[column].color = GetColor(0, 200, 200);
+			judgeZone[_column]._x1 = _judgeZone_x1_ceilingLine;
+			judgeZone[_column]._y1 = _judgeZone_y1_ceilingLine;
+			judgeZone[_column]._x2 = _judgeZone_x1_ceilingLine + _judgeZone_x2_bottomLine / JUDGE_NUM;
+			judgeZone[_column]._y2 = _judgeZone_y1_bottomLine;
+			judgeZone[_column]._color = GetColor(0, 200, 200);
 			break;
 		case 1: // レーン1
-			judgeZone[column].x1 = judgeZoneX_left_1 + judgeZoneX_right_2 / JUDGE_NUM;
-			judgeZone[column].y1 = judgeZoneY_top_1;
-			judgeZone[column].x2 = (judgeZoneX_left_1 + (judgeZoneX_right_2 / JUDGE_NUM * 2) - 45);
-			judgeZone[column].y2 = judgeZoneY_top_2;
-			judgeZone[column].color = GetColor(0, 200, 200);
+			judgeZone[_column]._x1 = _judgeZone_x1_ceilingLine + _judgeZone_x2_bottomLine / JUDGE_NUM;
+			judgeZone[_column]._y1 = _judgeZone_y1_ceilingLine;
+			judgeZone[_column]._x2 = (_judgeZone_x1_ceilingLine + (_judgeZone_x2_bottomLine / JUDGE_NUM * 2) - 45);
+			judgeZone[_column]._y2 = _judgeZone_y1_bottomLine;
+			judgeZone[_column]._color = GetColor(0, 200, 200);
 			break;
 		case 2: // レーン2
-			judgeZone[column].x1 = (judgeZoneX_left_1 + (judgeZoneX_right_2 / JUDGE_NUM * 2) - 45);
-			judgeZone[column].y1 = judgeZoneY_top_1;
-			judgeZone[column].x2 = judgeZoneX_left_1 + (judgeZoneX_right_2 / JUDGE_NUM * 2.5f + 65);
-			judgeZone[column].y2 = judgeZoneY_top_2;
-			judgeZone[column].color = GetColor(0, 200, 200);
+			judgeZone[_column]._x1 = (_judgeZone_x1_ceilingLine + (_judgeZone_x2_bottomLine / JUDGE_NUM * 2) - 45);
+			judgeZone[_column]._y1 = _judgeZone_y1_ceilingLine;
+			judgeZone[_column]._x2 = _judgeZone_x1_ceilingLine + (_judgeZone_x2_bottomLine / JUDGE_NUM * 2.5f + 65);
+			judgeZone[_column]._y2 = _judgeZone_y1_bottomLine;
+			judgeZone[_column]._color = GetColor(0, 200, 200);
 			break;
 		case 3: // レーン3
-			judgeZone[column].x1 = judgeZoneX_left_1 + (judgeZoneX_right_2 / JUDGE_NUM * 2.5f + 65);
-			judgeZone[column].y1 = judgeZoneY_top_1;
-			judgeZone[column].x2 = judgeZoneX_right_1;
-			judgeZone[column].y2 = judgeZoneY_top_2;
-			judgeZone[column].color = GetColor(0, 200, 200);
+			judgeZone[_column]._x1 = _judgeZone_x1_ceilingLine + (_judgeZone_x2_bottomLine / JUDGE_NUM * 2.5f + 65);
+			judgeZone[_column]._y1 = _judgeZone_y1_ceilingLine;
+			judgeZone[_column]._x2 = _judgeZone_x2_ceilingLine;
+			judgeZone[_column]._y2 = _judgeZone_y1_bottomLine;
+			judgeZone[_column]._color = GetColor(0, 200, 200);
 			break;
 		}
 
-		judgeZone[column].isActive = true;
+		judgeZone[_column]._isActive = true;
 	}
 }
 
 
+//　判定処理----------------------------------------------------------------------------------------------------
+void JudgeZone::JudgeGrade(
+	std::vector<NormalNote>& normal_note, 
+	const int& row, 
+	const double& timer, 
+	std::vector<double>& should_input_time)
+{
 
-void JudgeZone::RenderMap() {
+	// 入力すべきタイミングと実際の入力タイミングとの差を取得
+	double timeDiff = abs(should_input_time[row] - timer);
 
-	// 横線描画
-	DrawLineAA(judgeZoneX_left_1, judgeZoneY_top_1, judgeZoneX_right_1, judgeZoneY_top_1, -1, 2.0f); // 上辺
-	DrawLineAA(judgeZoneX_left_2, judgeZoneY_top_2, judgeZoneX_right_2, judgeZoneY_top_2, -1, 2.0f); // 下辺
+	if (timeDiff > 1.8) return;
 
-	float space = 50.0f;
-	float x1;  // 始点X
-	float x2;  // 終点X
+		normal_note[row]._isActive = false;
 
-	// 斜め線5本描画
-	for (int i = 0; i < JUDGE_NUM + 1; i++) {
+	if (timeDiff < 0.2) {
 
-		switch (i)
+		_scoreComboRef->_myScore += 1000;
+		_scoreComboRef->_myCombo++;
+		_scoreComboRef->_perfectCount++;
+		_scoreComboRef->_comboAnimationFrames = _scoreComboRef->_comboAnimationDuration;
+		_scoreComboRef->_combo_y1 -= 5;
+		RenderJudgeScore_OneMoment(TIMING::PERFECT);
+		return;
+	}
+	else if (timeDiff < 0.4) {
+
+		_scoreComboRef->_myScore += 750;
+		_scoreComboRef->_myCombo++;
+		_scoreComboRef->_greatCount++;
+		_scoreComboRef->_comboAnimationFrames = _scoreComboRef->_comboAnimationDuration;
+		RenderJudgeScore_OneMoment(TIMING::GREAT);
+		return;
+	}
+	else if (timeDiff < 0.6) {
+
+		_scoreComboRef->_myScore += 500;
+		_scoreComboRef->_myCombo++;
+		_scoreComboRef->_goodCount++;
+		_scoreComboRef->_comboAnimationFrames = _scoreComboRef->_comboAnimationDuration;
+		RenderJudgeScore_OneMoment(TIMING::GOOD);
+		return;
+	}
+	else if (timeDiff < 0.8) {
+
+		_scoreComboRef->_myScore += 200;
+		_scoreComboRef->_myCombo = 0;
+		_scoreComboRef->_poorCount++;
+		RenderJudgeScore_OneMoment(TIMING::POOR);
+		return;
+	}
+	else if (timeDiff < 1.0) {
+
+		_scoreComboRef->_myCombo = 0;
+		_scoreComboRef->_missCount++;
+		RenderJudgeScore_OneMoment(TIMING::MISS);
+		return;
+	}
+}
+
+
+void JudgeZone::JudgeGrade(
+	std::vector<LongNote>& long_note,
+	const int& row, 
+	const double& timer,
+	std::vector<double>& should_input_time)
+{
+
+	// 入力すべきタイミングと実際の入力タイミングとの差を取得
+	double timeDiff = abs(should_input_time[row] - timer);
+
+	if (timeDiff > 1.8) return;
+
+	long_note[row]._isActive = false;
+
+	if (timeDiff < 0.6) {
+
+		_scoreComboRef->_myScore += 1000;
+		_scoreComboRef->_myCombo++;
+		_scoreComboRef->_perfectCount++;
+		_scoreComboRef->_comboAnimationFrames = _scoreComboRef->_comboAnimationDuration;
+		_scoreComboRef->_combo_y1 -= 5;
+		RenderJudgeScore_OneMoment(TIMING::PERFECT);
+		return;
+	}
+	else if (timeDiff < 0.8) {
+
+		_scoreComboRef->_myScore += 750;
+		_scoreComboRef->_myCombo++;
+		_scoreComboRef->_greatCount++;
+		_scoreComboRef->_comboAnimationFrames = _scoreComboRef->_comboAnimationDuration;
+		RenderJudgeScore_OneMoment(TIMING::GREAT);
+		return;
+	}
+	else if (timeDiff < 1.0) {
+
+		_scoreComboRef->_myScore += 500;
+		_scoreComboRef->_myCombo++;
+		_scoreComboRef->_goodCount++;
+		_scoreComboRef->_comboAnimationFrames = _scoreComboRef->_comboAnimationDuration;
+		RenderJudgeScore_OneMoment(TIMING::GOOD);
+		return;
+	}
+	else if (timeDiff < 1.2) {
+
+		_scoreComboRef->_myScore += 200;
+		_scoreComboRef->_myCombo = 0;
+		_scoreComboRef->_poorCount++;
+		RenderJudgeScore_OneMoment(TIMING::POOR);
+		return;
+	}
+}
+
+
+void JudgeZone::JudgeNoteHit_ByInputKey(
+	std::vector<NormalNote>& normal_note,
+	const int& row,
+	const double& timer,
+	std::vector<double>& should_input_time)
+{
+
+	UpdateInputKey();
+
+	for (int i = 0; i < should_input_time.size(); i++) {
+
+		for (_column = 0; _column < JUDGE_NUM; _column++) {
+
+			if (_receiveKeyInputBuf[KEYS[_column]] == 1) {
+
+				// ノーマルノーツの当たり判定
+				if (normal_note[row]._isActive) {
+
+					JudgeGrade(normal_note, row, timer, should_input_time);
+				}
+
+				// キーを入力したら色が変わる
+				judgeZone[_column].brightnessAlpha = BRIGHTNESS_ON;
+			}
+			else if (_receiveKeyInputBuf[KEYS[_column]] == 0) {
+
+				// 放したら色を戻す
+				judgeZone[_column].brightnessAlpha = BRIGHTNESS_OFF;
+			}
+		}
+	}
+}
+
+
+void JudgeZone::JudgeNoteHit_ByInputKey(
+	std::vector<LongNote>& long_note,
+	const int& row,
+	const double& timer,
+	std::vector<double>& should_input_time) 
+{
+
+	UpdateInputKey();
+
+	for (int i = 0; i < should_input_time.size(); i++) {
+
+		for (_column = 0; _column < JUDGE_NUM; _column++) {
+
+			if (_receiveKeyInputBuf[KEYS[_column]]) {
+
+				// ロングノーツの当たり判定
+				if (long_note[row]._isActive) {
+
+					JudgeGrade(long_note, row, timer, should_input_time);
+				}
+
+				// キーを入力したら色が変わる
+				judgeZone[_column].brightnessAlpha = BRIGHTNESS_ON;
+			}
+			else if (_receiveKeyInputBuf[KEYS[_column]] == 0) {
+
+				// 放したら色を戻す
+				judgeZone[_column].brightnessAlpha = BRIGHTNESS_OFF;
+			}
+		}
+	}
+}
+
+
+//　入力処理--------------------------------------------------------------------------------
+int JudgeZone::UpdateInputKey() {
+
+	char tmpKey[256];
+	GetHitKeyStateAll(tmpKey);
+
+	for (int i = 0; i < 256; i++)
+	{
+		if (tmpKey[i] != 0) // キーコードに対応するキーが押されていたら
 		{
-		case 1:
-			x1 = base_x1 + 2 * space;
-			x2 = EACHAREA_WIDTH;
-			break;
-		case 2:
-			x1 = base_x1 + 3 * space;
-			x2 = EACHAREA_WIDTH * 2;
-			break;
-		case 3:
-			x1 = base_x1 + 4 * space;
-			x2 = EACHAREA_WIDTH * 3;
-			break;
-		case 4:
-			x1 = base_x1 + 5 * space;
-			x2 = EACHAREA_WIDTH * 4.2f;
-			break;
-		default:
-			x1 = base_x1 + space;
-			x2 = EACHAREA_WIDTH * -0.2f;
-			break;
+			_receiveKeyInputBuf[i]++;
 		}
-
-		// 斜め線描画
-		DrawLineAA(x1, base_y1, x2, base_y2, -1, 2.0f);
+		else
+		{
+			_receiveKeyInputBuf[i] = 0;
+		}
 	}
+	return 0;
 }
 
 
-
+// 描画----------------------------------------------------------------------------------------------------
 void JudgeZone::RenderJudgeZones() {
 
-	for (column = 0; column < JUDGE_NUM; column++) {
+	for (_column = 0; _column < JUDGE_NUM; _column++) {
 
-		switch (column)
+		switch (_column)
 		{
 		case 0:
 		case 1:
 		case 2:
 		case 3:
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, judgeZone[column].brightnessAlpha);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, judgeZone[_column].brightnessAlpha);
 
 			DrawRoundRectAA(
-				judgeZone[column].x1,
-				judgeZone[column].y1,
-				judgeZone[column].x2,
-				judgeZone[column].y2,
+				judgeZone[_column]._x1,
+				judgeZone[_column]._y1,
+				judgeZone[_column]._x2,
+				judgeZone[_column]._y2,
 				10.f, 0.1f, 4,
-				judgeZone[column].color, true, 1.5f
+				judgeZone[_column]._color, true, 1.5f
 			);
 			break;
 		}
@@ -150,7 +330,7 @@ void JudgeZone::RenderJudgeZones() {
 
 
 // １回ごとの判定結果を小さく表示
-void JudgeZone::RenderJudgeScore_OneMoment(JUDGE_TIMING j) {
+void JudgeZone::RenderJudgeScore_OneMoment(TIMING j) {
 
 	// スコア対応表
 	const char* scoreTable[32] = { "1000","750","500","200","0" };
@@ -159,23 +339,23 @@ void JudgeZone::RenderJudgeScore_OneMoment(JUDGE_TIMING j) {
 
 	switch (j)
 	{
-	case JUDGE_TIMING::PERFECT:
+	case TIMING::PERFECT:
 		strcpy_s(grade, "PERFECT");
 		strcpy_s(score, scoreTable[0]);
 		break;
-	case JUDGE_TIMING::GREAT:
+	case TIMING::GREAT:
 		strcpy_s(grade, "GREAT");
 		strcpy_s(score, scoreTable[1]);
 		break;
-	case JUDGE_TIMING::GOOD:
+	case TIMING::GOOD:
 		strcpy_s(grade, "GOOD");
 		strcpy_s(score, scoreTable[2]);
 		break;
-	case JUDGE_TIMING::POOR:
+	case TIMING::POOR:
 		strcpy_s(grade, "POOR");
 		strcpy_s(score, scoreTable[3]);
 		break;
-	case JUDGE_TIMING::MISS:
+	case TIMING::MISS:
 		strcpy_s(grade, "MISS");
 		strcpy_s(score, scoreTable[4]);
 		break;
@@ -183,191 +363,51 @@ void JudgeZone::RenderJudgeScore_OneMoment(JUDGE_TIMING j) {
 
 	SetFontSize(25);
 	// 判定結果
-	DrawStringEx(judgeZone[column].x1 + 100, judgeZone[column].y1 - 80, 0xFF00CED1, grade);
+	DrawStringEx(judgeZone[_column]._x1 + 100, judgeZone[_column]._y1 - 80, 0xFF00CED1, grade);
 	// 獲得スコア
-	DrawStringEx(judgeZone[column].x1 + 100, judgeZone[column].y1 - 50, 0xFF00CED1, score);
+	DrawStringEx(judgeZone[_column]._x1 + 100, judgeZone[_column]._y1 - 50, 0xFF00CED1, score);
 	SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 
+void JudgeZone::RenderMap() {
 
-void JudgeZone::JudgeGrade(std::vector<NormalNote>& normal_note, const int& row, const double& _timer, std::vector<double>& should_input_time) {
+	// 横線描画
+	DrawLineAA(_judgeZone_x1_ceilingLine, _judgeZone_y1_ceilingLine, _judgeZone_x2_ceilingLine, _judgeZone_y1_ceilingLine, -1, 2.0f); // 上辺
+	DrawLineAA(_judgeZone_x1_bottomLine, _judgeZone_y1_bottomLine, _judgeZone_x2_bottomLine, _judgeZone_y1_bottomLine, -1, 2.0f); // 下辺
 
-	// 入力すべきタイミングと実際の入力タイミングとの差を取得
-	double timeDiff = abs(should_input_time[row] - _timer);
+	float space = 50.0f;
+	float _x1;  // 始点X
+	float _x2;  // 終点X
 
-	if (timeDiff > 1.8) return;
+	// 斜め線5本描画
+	for (int i = 0; i < JUDGE_NUM + 1; i++) {
 
-		normal_note[row].isActive = false;
-
-	if (timeDiff < 0.2) {
-
-
-		scoreComboRef->myScore += 1000;
-		scoreComboRef->myCombo++;
-		scoreComboRef->perfect_count++;
-		scoreComboRef->comboAnimationFrames = scoreComboRef->comboAnimationDuration;
-		scoreComboRef->y1_combo -= 5;
-		RenderJudgeScore_OneMoment(JUDGE_TIMING::PERFECT);
-		return;
-	}
-	else if (timeDiff < 0.4) {
-
-		scoreComboRef->myScore += 750;
-		scoreComboRef->myCombo++;
-		scoreComboRef->great_count++;
-		scoreComboRef->comboAnimationFrames = scoreComboRef->comboAnimationDuration;
-		RenderJudgeScore_OneMoment(JUDGE_TIMING::GREAT);
-		return;
-	}
-	else if (timeDiff < 0.6) {
-
-		scoreComboRef->myScore += 500;
-		scoreComboRef->myCombo++;
-		scoreComboRef->good_count++;
-		scoreComboRef->comboAnimationFrames = scoreComboRef->comboAnimationDuration;
-		RenderJudgeScore_OneMoment(JUDGE_TIMING::GOOD);
-		return;
-	}
-	else if (timeDiff < 0.8) {
-
-		scoreComboRef->myScore += 200;
-		scoreComboRef->myCombo = 0;
-		scoreComboRef->poor_count++;
-		RenderJudgeScore_OneMoment(JUDGE_TIMING::POOR);
-		return;
-	}
-	else if (timeDiff < 1.0) {
-
-		scoreComboRef->myCombo = 0;
-		scoreComboRef->miss_count++;
-		RenderJudgeScore_OneMoment(JUDGE_TIMING::MISS);
-		return;
-	}
-}
-
-
-void JudgeZone::JudgeGrade(std::vector<LongNote>& long_note, const int& row, const double& timer, std::vector<double>& should_input_time) {
-
-	// 入力すべきタイミングと実際の入力タイミングとの差を取得
-	double timeDiff = abs(should_input_time[row] - timer);
-
-	if (timeDiff > 1.8) return;
-
-	long_note[row].isActive = false;
-
-	if (timeDiff < 0.6) {
-
-		scoreComboRef->myScore += 1000;
-		scoreComboRef->myCombo++;
-		scoreComboRef->perfect_count++;
-		scoreComboRef->comboAnimationFrames = scoreComboRef->comboAnimationDuration;
-		scoreComboRef->y1_combo -= 5;
-		RenderJudgeScore_OneMoment(JUDGE_TIMING::PERFECT);
-		return;
-	}
-	else if (timeDiff < 0.8) {
-
-		scoreComboRef->myScore += 750;
-		scoreComboRef->myCombo++;
-		scoreComboRef->great_count++;
-		scoreComboRef->comboAnimationFrames = scoreComboRef->comboAnimationDuration;
-		RenderJudgeScore_OneMoment(JUDGE_TIMING::GREAT);
-		return;
-	}
-	else if (timeDiff < 1.0) {
-
-		scoreComboRef->myScore += 500;
-		scoreComboRef->myCombo++;
-		scoreComboRef->good_count++;
-		scoreComboRef->comboAnimationFrames = scoreComboRef->comboAnimationDuration;
-		RenderJudgeScore_OneMoment(JUDGE_TIMING::GOOD);
-		return;
-	}
-	else if (timeDiff < 1.2) {
-
-		scoreComboRef->myScore += 200;
-		scoreComboRef->myCombo = 0;
-		scoreComboRef->poor_count++;
-		RenderJudgeScore_OneMoment(JUDGE_TIMING::POOR);
-		return;
-	}
-}
-
-
-int JudgeZone::UpdateInputKey() {
-
-	char tmpKey[256];
-	GetHitKeyStateAll(tmpKey);
-
-	for (int i = 0; i < 256; i++)
-	{
-		if (tmpKey[i] != 0) // キーコードに対応するキーが押されていたら
+		switch (i)
 		{
-			ReceiveKeyInput[i]++;
+		case 1:
+			_x1 = _diagonalLine_x1 + 2 * space;
+			_x2 = EACHAREA_WIDTH;
+			break;
+		case 2:
+			_x1 = _diagonalLine_x1 + 3 * space;
+			_x2 = EACHAREA_WIDTH * 2;
+			break;
+		case 3:
+			_x1 = _diagonalLine_x1 + 4 * space;
+			_x2 = EACHAREA_WIDTH * 3;
+			break;
+		case 4:
+			_x1 = _diagonalLine_x1 + 5 * space;
+			_x2 = EACHAREA_WIDTH * 4.2f;
+			break;
+		default:
+			_x1 = _diagonalLine_x1 + space;
+			_x2 = EACHAREA_WIDTH * -0.2f;
+			break;
 		}
-		else
-		{
-			ReceiveKeyInput[i] = 0;
-		}
-	}
-	return 0;
-}
 
-
-void JudgeZone::JudgeNoteHit_ByInputKey(std::vector<NormalNote>& normal_note, const int& row, const double& timer, std::vector<double>& should_input_time) {
-
-	UpdateInputKey();
-
-	for (int i = 0; i < should_input_time.size(); i++) {
-
-		for (column = 0; column < JUDGE_NUM; column++) {
-
-			if (ReceiveKeyInput[KEYS[column]] == 1) {
-
-				// ノーマルノーツの当たり判定
-				if (normal_note[row].isActive) {
-
-					JudgeGrade(normal_note, row, timer, should_input_time);
-				}
-
-				// キーを入力したら色が変わる
-				judgeZone[column].brightnessAlpha = BRIGHTNESS_ON;
-			}
-			else if (ReceiveKeyInput[KEYS[column]] == 0) {
-
-				// 放したら色を戻す
-				judgeZone[column].brightnessAlpha = BRIGHTNESS_OFF;
-			}
-		}
-	}
-}
-
-
-void JudgeZone::JudgeNoteHit_ByInputKey(std::vector<LongNote>& long_note, const int& row, const double& _timer, std::vector<double>& should_input_time) {
-
-	UpdateInputKey();
-
-	for (int i = 0; i < should_input_time.size(); i++) {
-
-		for (column = 0; column < JUDGE_NUM; column++) {
-
-			if (ReceiveKeyInput[KEYS[column]]) {
-
-				// ロングノーツの当たり判定
-				if (long_note[row].isActive) {
-
-					JudgeGrade(long_note, row, _timer, should_input_time);
-				}
-
-				// キーを入力したら色が変わる
-				judgeZone[column].brightnessAlpha = BRIGHTNESS_ON;
-			}
-			else if (ReceiveKeyInput[KEYS[column]] == 0) {
-
-				// 放したら色を戻す
-				judgeZone[column].brightnessAlpha = BRIGHTNESS_OFF;
-			}
-		}
+		// 斜め線描画
+		DrawLineAA(_x1, _diagonalLine_y1, _x2, _diagonalLine_y2, -1, 2.0f);
 	}
 }
